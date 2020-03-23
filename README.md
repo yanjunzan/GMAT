@@ -160,3 +160,18 @@ remma_epiAA_pair_cpu(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=be
 ```
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
