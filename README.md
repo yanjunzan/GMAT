@@ -63,6 +63,7 @@ from gmat.gmatrix import agmat, dgmat_as
 from gmat.uvlmm.design_matrix import design_matrix_wemai_multi_gmat
 from gmat.uvlmm.uvlmm_varcom import wemai_multi_gmat
 from gmat.remma.remma_cpu.remma_epiAA_cpu import remma_epiAA_cpu
+from gmat.remma.annotation import annotation_snp_pos
 logging.basicConfig(level=logging.INFO)
 
 pheno_file = 'pheno'
@@ -120,6 +121,7 @@ from gmat.uvlmm.design_matrix import design_matrix_wemai_multi_gmat
 from gmat.uvlmm.uvlmm_varcom import wemai_multi_gmat
 from gmat.remma.random_pair import random_pair
 from gmat.remma.remma_cpu.remma_epiAA_cpu import remma_epiAA_pair_cpu, remma_epiAA_eff_cpu_c
+from gmat.remma.annotation import annotation_snp_pos
 logging.basicConfig(level=logging.INFO)
 
 pheno_file = 'pheno'
