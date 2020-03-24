@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     cffi_modules=["gmat/remma/remma_cpu/_build.py:ffi", "gmat/process_plink/_build.py:ffi"],
     name='gmat',
-    version='2020.3.1',
+    version='2020.3.24',
     description='Genomic Multivariate Analysis Tools',
     long_description=open('README.md').read(),
     author='Chao Ning',

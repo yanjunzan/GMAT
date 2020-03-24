@@ -1,6 +1,7 @@
 import numpy as np
 from pandas_plink import read_plink1_bin
-
+from tqdm import tqdm
+import logging
 
 
 def read_plink(bed_file):
@@ -16,14 +17,22 @@ def impute_geno(snp_mat):
 
 
 def shuffle_bed(bed_file):
+    """
+    shuffle the genotypes of individuals snp-by-snp
+    :param bed_file: the prefix for plink binary file
+    :return: the shuffled plink binary file
+    """
     try:
         from pysnptools.snpreader import Bed
     except Exception as e:
         print(e)
         return 0
+    logging.INFO('Read the plink file')
     data = Bed(bed_file, count_A1=False).read()
     num_snp = data.val.shape[1]
-    for i in range(num_snp):
+    logging.INFO("Start shuffle the genotypes snp-by-snp")
+    for i in tqdm(range(num_snp)):
         np.random.shuffle(data.val[:, i])
+    logging.INFO('Write the shuffled plink file')
     Bed.write(bed_file + '_shuffle', data, count_A1=False)
     return 1

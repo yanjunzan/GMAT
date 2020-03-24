@@ -19,7 +19,7 @@ def gtf_to_gene_info(gtf_file):
     fout.close()
 
 
-def annotation_snp_pos(res_file, bed_file, p_cut=1.0e-6):
+def annotation_snp_pos(res_file, bed_file, p_cut=None):
     """
     注释互作检验的SNP信息
     :param res_file: 互作检验结果文件，前两列是互作SNP对的顺序编号，最后一列是P值
@@ -46,7 +46,7 @@ def annotation_snp_pos(res_file, bed_file, p_cut=1.0e-6):
     fout.write('\n')
     for line in fin:
         arr = line.split()
-        if float(arr[-1]) < p_cut:
+        if p_cut is None or float(arr[-1]) < p_cut:
             fout.write(' '.join([arr[0], snp_info[arr[0]], arr[1], snp_info[arr[1]]]))
             fout.write(' ')
             fout.write(' '.join(arr[2:]))
