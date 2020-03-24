@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <omp.h>
 #include <math.h> 
+#include <time.h>
 
 
 int read_plink_bed(char *bed_file, long long num_id, long long num_snp, double *marker_mat)
@@ -60,6 +61,9 @@ int print_outAA(long long i, long long *snp_lst_0, long long num_snp, long long 
 	/*输出互作效应，为openmp服务 */
 	long long j=0, k=0;
 	double epi_effect=0.0;
+	clock_t start, finish;
+	double  duration;
+	start = clock();
 	for(j = snp_lst_0[i]+1; j < num_snp; j++){
 		epi_effect = 0.0;
 	    for(k = 0; k < num_id; k++){
@@ -69,6 +73,9 @@ int print_outAA(long long i, long long *snp_lst_0, long long num_snp, long long 
         	fprintf(out_res, "%lld %lld %g\n", snp_lst_0[i], j, epi_effect);
     	}
 	}
+	finish = clock();
+	duration = (double)(finish - start);
+	printf( "Time for the %lld SNP is: %f seconds\n", i, duration);
 	return 0;
 }
 
@@ -124,6 +131,9 @@ int remma_epiAA_eff_cpu(char *bed_file, long long num_id, long long num_snp,
 int print_outAD(long long i, long long *snp_lst_0, long long num_snp, long long num_id, double *marker_matA, double *marker_matD, double *pymat, double eff_cut, FILE *out_res) {
 	long long j=0, k=0;
 	double epi_effect=0.0;
+	clock_t start, finish;
+	double  duration;
+	start = clock();
 	for(j = snp_lst_0[i]+1; j < num_snp; j++){
 		epi_effect = 0.0;
 	    for(k = 0; k < num_id; k++){
@@ -140,6 +150,9 @@ int print_outAD(long long i, long long *snp_lst_0, long long num_snp, long long 
         	fprintf(out_res, "%lld %lld %g\n", j, snp_lst_0[i], epi_effect);
     	}
 	}
+	finish = clock();
+	duration = (double)(finish - start);
+	printf( "Time for the %lld SNP is: %f seconds\n", i, duration);
 	return 0;
 }
 
@@ -201,6 +214,9 @@ int remma_epiAD_eff_cpu(char *bed_file, long long num_id, long long num_snp,
 int print_outDD(long long i, long long *snp_lst_0, long long num_snp, long long num_id, double *marker_mat, double *pymat, double eff_cut, FILE *out_res) {
 	long long j=0, k=0;
 	double epi_effect=0.0;
+	clock_t start, finish;
+	double duration;
+	start = clock();
 	for(j = snp_lst_0[i]+1; j < num_snp; j++){
 		epi_effect = 0.0;
 	    for(k = 0; k < num_id; k++){
@@ -210,6 +226,9 @@ int print_outDD(long long i, long long *snp_lst_0, long long num_snp, long long 
         	fprintf(out_res, "%lld %lld %g\n", snp_lst_0[i], j, epi_effect);
     	}
 	}
+	finish = clock();
+	duration = (double)(finish - start);
+	printf( "Time for the %lld SNP is: %f seconds\n", i, duration);
 	return 0;
 }
 

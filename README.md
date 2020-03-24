@@ -62,7 +62,7 @@ import pandas as pd
 from gmat.gmatrix import agmat, dgmat_as
 from gmat.uvlmm.design_matrix import design_matrix_wemai_multi_gmat
 from gmat.uvlmm.uvlmm_varcom import wemai_multi_gmat
-from gmat.remma.remma_cpu.remma_epiAA_cpu import remma_epiAA_cpu
+from gmat.remma.remma_cpu.remma_epiAA_cpu import remma_epiAA_cpu, remma_epiAA_cpu_parallel
 from gmat.remma.annotation import annotation_snp_pos
 logging.basicConfig(level=logging.INFO)
 
@@ -79,33 +79,43 @@ y, xmat, zmat = design_matrix_wemai_multi_gmat(pheno_file, bed_file)
 # Step 3: Estimate the variances
 gmat_lst = [agmat_lst[0], agmat_lst[0]*agmat_lst[0]]  # agmat_lst[0]*agmat_lst[0] is the additive by additive genomic relationship matrix
 var_com_a_axa = wemai_multi_gmat(y, xmat, zmat, gmat_lst)
-print(var_com_a_ax)  # a list： [0] addtive variance; [1] additive by additive variance; [2] residual variance
+print(var_com_a_axa)  # a list： [0] addtive variance; [1] additive by additive variance; [2] residual variance
 
 # Step 4: Test
 remma_epiAA_cpu(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, snp_lst_0=None, p_cut=0.0001, out_file='remma_epiAA_cpu')
 
 # Step 5: Select top SNPs and add the SNP position
 res_file = 'remma_epiAA_cpu'  # result file
-annotation_snp_pos(res_file, bed_file, p_cut=1.0e-7)
+annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
 ```
 
 #### parallel 
-The parameter snp_lst_0 means a list of snp index for the first SNP. Default value is None which means range(0, num_snp-1). For each SNP in the snp_lst_0, all SNPs after this SNP will pair with this SNP, i.e., the *i*th SNP will pari with range(i+1, num_snp).
-
-How to divide all SNPs equally? Taking three equal subset as an example.
+Analysis can be subdivided with remma_epiAA_cpu_parallel and run parallelly on different machines.
 
 
 ```python
-snp_df = pd.read_csv(bed_file + '.bim', header=None, sep='\s+')
-num_snp = snp_df.shape[0]  # the number of snp
-num_snp_part = int(num_snp/6)  # Divide six parts
-part1 = list(range(0, num_snp_part)) + list(range(5*num_snp_part, num_snp-1))
-part2 = list(range(num_snp_part, 2*num_snp_part)) + list(range(4*num_snp_part, 5*num_snp_part))
-part3 = list(range(2*num_snp_part, 3*num_snp_part)) + list(range(3*num_snp_part, 4*num_snp_part))
-# submit following codes at the same time
-remma_epiAA_cpu(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, snp_lst_0=part1, p_cut=0.0001, out_file='remma_epiAA_cpu.1')
-remma_epiAA_cpu(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, snp_lst_0=part2, p_cut=0.0001, out_file='remma_epiAA_cpu.2')
-remma_epiAA_cpu(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, snp_lst_0=part3, p_cut=0.0001, out_file='remma_epiAA_cpu.3')
+from gmat.remma.remma_cpu.remma_epiAA_cpu import remma_epiAA_cpu_parallel
+remma_epiAA_cpu_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, parallel=[3,1], p_cut=0.0001, out_file='remma_epiAA_cpu')
+remma_epiAA_cpu_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, parallel=[3,2], p_cut=0.0001, out_file='remma_epiAA_cpu')
+remma_epiAA_cpu_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, parallel=[3,3], p_cut=0.0001, out_file='remma_epiAA_cpu')
+# Then merge files 'remma_epiAA_cpu.1', 'remma_epiAA_cpu.2' and 'remma_epiAA_cpu.3' with the following codes.
+fout = open("remma_epiAA_cpu.merge", 'w')
+fin = open('remma_epiAA_cpu.1')
+head_line = fin.readline()
+fout.write(head_line)
+fin.close()
+for i in range(1, 4):
+    fin = open('remma_epiAA_cpu.' + str(i))
+    head_line = fin.readline()
+    for line in fin:
+        fout.write(line)
+    fin.close()
+
+fout.close()
+
+# Select top SNPs and add the SNP position
+res_file = 'remma_epiAA_cpu.merge'  # result file
+annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
 ```
 
 #### 2. approximate test (recommended for big data)
@@ -153,18 +163,13 @@ res_df = pd.read_csv('remma_epiAA_pair_cpu_random', header=0, sep='\s+')
 print(np.median(res_df['p']))  # P value close to 0.5. It means type I error controlled well
 var_median = np.median(res_df['var'])  # median of variances for estimated epistatic SNP effects
 
-# step 7: Calculate the effect cut based on the p_cut
-p_cut = 1.0e-5
-chi_cut = chi2.isf(p_cut, 1)
-eff_cut = np.sqrt(chi_cut*var_median)
+# step 7: Screen the effects and select top SNP pairs based of effect cut
+remma_epiAA_eff_cpu_c(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, snp_lst_0=None, var_app=var_median, p_cut=1e-05, out_file='remma_epiAA_eff_cpu_c')
 
-# step 8: Screen the effects and select top SNP pairs based of effect cut
-remma_epiAA_eff_cpu_c(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, snp_lst_0=None, eff_cut=eff_cut, out_file='remma_epiAA_eff_cpu_c')
-
-# Step 9: Calculate p values for top SNP pairs
+# Step 8: Calculate p values for top SNP pairs
 remma_epiAA_pair_cpu(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, snp_pair_file="remma_epiAA_eff_cpu_c", max_test_pair=50000, p_cut=1, out_file='remma_epiAA_pair_cpu_res')
 
-# Step 10: Select top SNPs and add the SNP position
+# Step 9: Select top SNPs and add the SNP position
 res_file = 'remma_epiAA_pair_cpu_res'  # result file
-annotation_snp_pos(res_file, bed_file, p_cut=1.0e-7)
+annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
 ```
