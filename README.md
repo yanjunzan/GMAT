@@ -84,7 +84,7 @@ print(var_com_a_ax)  # a list： [0] addtive variance; [1] additive by additive 
 remma_epiAA_cpu(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, snp_lst_0=None, p_cut=0.0001, out_file='remma_epiAA_cpu')
 
 # Step 5: Select top SNPs and add the SNP position
-res_file = 'remma_epiAA_cpu'  # 结果文件
+res_file = 'remma_epiAA_cpu'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-7)
 ```
 
