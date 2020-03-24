@@ -82,6 +82,10 @@ print(var_com_a_ax)  # a list： [0] addtive variance; [1] additive by additive 
 
 # Step 4: Test
 remma_epiAA_cpu(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, snp_lst_0=None, p_cut=0.0001, out_file='remma_epiAA_cpu')
+
+# Step 5: Select top SNPs and add the SNP position
+res_file = 'remma_epiAA_cpu'  # 结果文件
+annotation_snp_pos(res_file, bed_file, p_cut=1.0e-7)
 ```
 
 #### parallel 
@@ -157,21 +161,8 @@ remma_epiAA_eff_cpu_c(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=b
 
 # Step 9: Calculate p values for top SNP pairs
 remma_epiAA_pair_cpu(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, snp_pair_file="remma_epiAA_eff_cpu_c", max_test_pair=50000, p_cut=1, out_file='remma_epiAA_pair_cpu_res')
+
+# Step 10: Select top SNPs and add the SNP position
+res_file = 'remma_epiAA_pair_cpu_res'  # result file
+annotation_snp_pos(res_file, bed_file, p_cut=1.0e-7)
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
