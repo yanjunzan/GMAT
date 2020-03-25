@@ -20,7 +20,7 @@ def impute_geno(snp_mat):
         code_count = code0 + code1 + code2
         p_lst = [code0/code_count, code1/code_count, code2/code_count]
         icol_na = np.where(np.isnan(snpi))
-        snpi = np.random.choice([0.0, 1.0, 2.0], len(icol_na[0]), p=p_lst)
+        snpi[icol_na] = np.random.choice([0.0, 1.0, 2.0], len(icol_na[0]), p=p_lst)
         snp_mat[:, i] = snpi
     return snp_mat
 
