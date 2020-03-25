@@ -3,9 +3,10 @@ from setuptools import setup, find_packages
 setup(
     cffi_modules=["gmat/remma/remma_cpu/_build.py:ffi", "gmat/process_plink/_build.py:ffi"],
     name='gmat',
-    version='2020.3.24',
+    version='2020.3.25',
     description='Genomic Multivariate Analysis Tools',
     long_description=open('README.md').read(),
+    long_description_content_type="text/markdown",
     author='Chao Ning',
     author_email='ningchao91@gmail.com',
     packages=find_packages(),

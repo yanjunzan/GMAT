@@ -38,7 +38,7 @@ Missing genotypes are recommended to impute with Beagle or other softwares, alth
 
 * phenotypic file:  
 (1) Delimited by blanks or tabs;  
-(2) All individuals in the plink file must have phenotypic values. If no, please remove these individuals from the plink binary file;
+(2) All individuals in the plink file must have phenotypic values. If no, please remove these individuals from the plink binary file;  
 (3) The fisrt column is the family id and the second column is the individual id. The first two columns are the same to plink fam file, but order can be different;  
 (4) The last column is the phenotypic values. **Miss values are not allowed**;  
 (5) The covariates (including population means) are put before the phenotypic column. A column of 1’s must be contained.  
@@ -97,7 +97,8 @@ Analysis can be subdivided with remma_epiAA_cpu_parallel and run parallelly on d
 
 
 ```python
-# Srep 1-3 is same to the above
+# Step 1-3 is same to the above
+
 # Step 4: parallel test. Write the codes in separate scripts and run separately.
 from gmat.remma.remma_cpu.remma_epiAA_cpu import remma_epiAA_cpu_parallel
 remma_epiAA_cpu_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, parallel=[3,1], 
@@ -106,19 +107,19 @@ remma_epiAA_cpu_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_fil
                          p_cut=0.0001, out_file='remma_epiAA_cpu')
 remma_epiAA_cpu_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, parallel=[3,3], 
                          p_cut=0.0001, out_file='remma_epiAA_cpu')
+
 # Step 5: Merge files 'remma_epiAA_cpu.1', 'remma_epiAA_cpu.2' and 'remma_epiAA_cpu.3' with the following codes.
-fout = open("remma_epiAA_cpu.merge", 'w')
-fin = open('remma_epiAA_cpu.1')
-head_line = fin.readline()
-fout.write(head_line)
-fin.close()
-for i in range(1, 4):
-    fin = open('remma_epiAA_cpu.' + str(i))
-    head_line = fin.readline()
-    for line in fin:
-        fout.write(line)
-    fin.close()
-fout.close()
+prefix = 'remma_epiAA_cpu'
+parallel_num = 3  # the number of parallels
+with open(prefix + ".merge", 'w') as fout:
+    with open(prefix + '.1') as fin:
+        head_line = fin.readline()
+        fout.write(head_line)
+    for i in range(1, 4):
+        with open(prefix + '.' + str(i)) as fin:
+            head_line = fin.readline()
+            for line in fin:
+                fout.write(line)
 
 # Step 6: Select top SNPs and add the SNP position
 res_file = 'remma_epiAA_cpu.merge'  # result file
@@ -182,13 +183,14 @@ Analysis can be subdivided with remma_epiAA_eff_cpu_c_parallel and run parallell
 
 ```python
 # Srep 1-6 is same to the above
+
 # Step 7: parallel test. Write the codes in separate scripts and run separately.
 from gmat.remma.remma_cpu.remma_epiAA_cpu import remma_epiAA_eff_cpu_c_parallel
-remma_epiAA_eff_cpu_c_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel=[3,1], 
+remma_epiAA_eff_cpu_c_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, parallel=[3,1], 
                                var_app=var_median, p_cut=1.0e-5, out_file='remma_epiAA_eff_cpu_c')
-remma_epiAA_eff_cpu_c_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel=[3,2], 
+remma_epiAA_eff_cpu_c_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, parallel=[3,2], 
                                var_app=var_median, p_cut=1.0e-5, out_file='remma_epiAA_eff_cpu_c')
-remma_epiAA_eff_cpu_c_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel=[3,3], 
+remma_epiAA_eff_cpu_c_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, parallel=[3,3], 
                                var_app=var_median, p_cut=1.0e-5, out_file='remma_epiAA_eff_cpu_c')
 
 # Step 8: Calculate exact p values for top SNP pairs
@@ -201,18 +203,17 @@ remma_epiAA_pair_cpu(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=be
 
 # Step 9: Merge files 'remma_epiAA_pair_cpu_res.1', 'remma_epiAA_pair_cpu_res.2' and 'remma_epiAA_pair_cpu_res.3' 
 # with the following codes.
-fout = open("remma_epiAA_pair_cpu_res.merge", 'w')
-fin = open('remma_epiAA_pair_cpu_res.1')
-head_line = fin.readline()
-fout.write(head_line)
-fin.close()
-for i in range(1, 4):
-    fin = open('remma_epiAA_pair_cpu_res.' + str(i))
-    head_line = fin.readline()
-    for line in fin:
-        fout.write(line)
-    fin.close()
-fout.close()
+prefix = 'remma_epiAA_pair_cpu_res'
+parallel_num = 3  # the number of parallels
+with open(prefix + ".merge", 'w') as fout:
+    with open(prefix + '.1') as fin:
+        head_line = fin.readline()
+        fout.write(head_line)
+    for i in range(1, 4):
+        with open(prefix + '.' + str(i)) as fin:
+            head_line = fin.readline()
+            for line in fin:
+                fout.write(line)
 
 # Step 10: Select top SNPs and add the SNP position
 res_file = 'remma_epiAA_pair_cpu_res.merge'  # result file
