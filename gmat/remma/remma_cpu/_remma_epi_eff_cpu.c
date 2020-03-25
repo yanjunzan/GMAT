@@ -4,6 +4,7 @@
 #include <omp.h>
 #include <math.h> 
 #include <time.h>
+//#define CLOCKS_PER_SEC ((clock_t)1000)
 
 
 int read_plink_bed(char *bed_file, long long num_id, long long num_snp, double *marker_mat)
@@ -74,7 +75,7 @@ int print_outAA(long long i, long long *snp_lst_0, long long num_snp, long long 
     	}
 	}
 	finish = clock();
-	duration = (double)(finish - start);
+	duration = (double)(finish - start) / CLOCKS_PER_SEC;
 	printf( "Time for the %lld SNP is: %f seconds\n", i, duration);
 	return 0;
 }
@@ -151,7 +152,7 @@ int print_outAD(long long i, long long *snp_lst_0, long long num_snp, long long 
     	}
 	}
 	finish = clock();
-	duration = (double)(finish - start);
+	duration = (double)(finish - start) / CLOCKS_PER_SEC;
 	printf( "Time for the %lld SNP is: %f seconds\n", i, duration);
 	return 0;
 }
@@ -227,7 +228,7 @@ int print_outDD(long long i, long long *snp_lst_0, long long num_snp, long long 
     	}
 	}
 	finish = clock();
-	duration = (double)(finish - start);
+	duration = (double)(finish - start) / CLOCKS_PER_SEC;
 	printf( "Time for the %lld SNP is: %f seconds\n", i, duration);
 	return 0;
 }
