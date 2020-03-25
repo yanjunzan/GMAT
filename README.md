@@ -145,7 +145,7 @@ logging.basicConfig(level=logging.INFO)
 pheno_file = 'pheno'
 bed_file = 'plink'
 
-# Srep 1-3 is same to exact test
+# Step 1-3 is same to exact test
 
 # Step 4: Randomly select 100,000 SNP pairs
 snp_df = pd.read_csv(bed_file + '.bim', header=None, sep='\s+')
@@ -182,7 +182,7 @@ Analysis can be subdivided with remma_epiAA_eff_cpu_c_parallel and run parallell
 
 
 ```python
-# Srep 1-6 is same to the above
+# Step 1-6 is same to the above
 
 # Step 7: parallel test. Write the codes in separate scripts and run separately.
 from gmat.remma.remma_cpu.remma_epiAA_cpu import remma_epiAA_eff_cpu_c_parallel
