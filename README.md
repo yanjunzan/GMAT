@@ -4,6 +4,8 @@ ningchao(at)sdau(dot)edu(dot)cn
 ningchao91(at)gmail(dot)com  
 
 # Install
+GMAT will keep updating. Please uninstall older version to obtain the latest functions. The easiest uninstall way:  
+\> pip uninstall gmat
 
 ## Dependencies
 * numpy>=1.16.0  
@@ -16,11 +18,12 @@ ningchao91(at)gmail(dot)com
 We recommend using a Python distribution such as [Anaconda](https://www.anaconda.com/distribution/) (Python 3.7 version). This distribution can be used on Linux and Windows and is free. It is the easiest way to get all the required package dependencies. 
 
 ## Quick install
-\> pip install gmat
+\> pip install gmat  
+
 ## Detailed Package Install Instructions:
 (1) Install the dependent packages  
 (2) Go to the directory of GMAT and type  
-\> python setup.py install
+\> python setup.py install  
 
 # REMMAX function  
 Rapid Epistatic Mixed Model Association Studies
@@ -31,7 +34,7 @@ Rapid Epistatic Mixed Model Association Studies
 
 ## Format of the input file.
 * Plink binary file including \*.bed, \*.bim and \*.fam.  
-Missing genotypes are recommended to impute with Beagle or other softwares  
+Missing genotypes are recommended to impute with Beagle or other softwares, although they will be imputed according the frequency of occurrence locus by locus.   
 
 * phenotypic file:  
 (1) Delimited by blanks or tabs;  
@@ -82,7 +85,7 @@ var_com_a_axa = wemai_multi_gmat(y, xmat, zmat, gmat_lst)
 print(var_com_a_axa)  # a list： [0] addtive variance; [1] additive by additive variance; [2] residual variance
 
 # Step 4: Test
-remma_epiAA_cpu(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, snp_lst_0=None, p_cut=0.0001, out_file='remma_epiAA_cpu')
+remma_epiAA_cpu(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, p_cut=0.0001, out_file='remma_epiAA_cpu')
 
 # Step 5: Select top SNPs and add the SNP position
 res_file = 'remma_epiAA_cpu'  # result file
@@ -94,11 +97,16 @@ Analysis can be subdivided with remma_epiAA_cpu_parallel and run parallelly on d
 
 
 ```python
+# Srep 1-3 is same to the above
+# Step 4: parallel test. Write the codes in separate scripts and run separately.
 from gmat.remma.remma_cpu.remma_epiAA_cpu import remma_epiAA_cpu_parallel
-remma_epiAA_cpu_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, parallel=[3,1], p_cut=0.0001, out_file='remma_epiAA_cpu')
-remma_epiAA_cpu_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, parallel=[3,2], p_cut=0.0001, out_file='remma_epiAA_cpu')
-remma_epiAA_cpu_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, parallel=[3,3], p_cut=0.0001, out_file='remma_epiAA_cpu')
-# Then merge files 'remma_epiAA_cpu.1', 'remma_epiAA_cpu.2' and 'remma_epiAA_cpu.3' with the following codes.
+remma_epiAA_cpu_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, parallel=[3,1], 
+                         p_cut=0.0001, out_file='remma_epiAA_cpu')
+remma_epiAA_cpu_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, parallel=[3,2], 
+                         p_cut=0.0001, out_file='remma_epiAA_cpu')
+remma_epiAA_cpu_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, parallel=[3,3], 
+                         p_cut=0.0001, out_file='remma_epiAA_cpu')
+# Step 5: Merge files 'remma_epiAA_cpu.1', 'remma_epiAA_cpu.2' and 'remma_epiAA_cpu.3' with the following codes.
 fout = open("remma_epiAA_cpu.merge", 'w')
 fin = open('remma_epiAA_cpu.1')
 head_line = fin.readline()
@@ -110,10 +118,9 @@ for i in range(1, 4):
     for line in fin:
         fout.write(line)
     fin.close()
-
 fout.close()
 
-# Select top SNPs and add the SNP position
+# Step 6: Select top SNPs and add the SNP position
 res_file = 'remma_epiAA_cpu.merge'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
 ```
@@ -130,24 +137,14 @@ from gmat.gmatrix import agmat, dgmat_as
 from gmat.uvlmm.design_matrix import design_matrix_wemai_multi_gmat
 from gmat.uvlmm.uvlmm_varcom import wemai_multi_gmat
 from gmat.remma.random_pair import random_pair
-from gmat.remma.remma_cpu.remma_epiAA_cpu import remma_epiAA_pair_cpu, remma_epiAA_eff_cpu_c
+from gmat.remma.remma_cpu.remma_epiAA_cpu import remma_epiAA_pair_cpu, remma_epiAA_eff_cpu_c, remma_epiAA_eff_cpu_c_parallel
 from gmat.remma.annotation import annotation_snp_pos
 logging.basicConfig(level=logging.INFO)
 
 pheno_file = 'pheno'
 bed_file = 'plink'
 
-# Step 1: Calculate the genomic relationship matrix
-agmat_lst = agmat(bed_file, inv=False) # additive genomic relationship matrix
-dgmat_lst = dgmat_as(bed_file, inv=False) # dominace genomic relationship matrix
-
-# Step 2: Prepare the phenotypic vector (y), designed matrix for fixed effects (xmat) and designed matrix for random effects (zmat)
-y, xmat, zmat = design_matrix_wemai_multi_gmat(pheno_file, bed_file)
-
-# Step 3: Estimate the variances
-gmat_lst = [agmat_lst[0], agmat_lst[0]*agmat_lst[0]]  # agmat_lst[0]*agmat_lst[0] is the additive by additive genomic relationship matrix
-var_com_a_axa = wemai_multi_gmat(y, xmat, zmat, gmat_lst)
-print(var_com_a_axa)  # a list： [0] addtive variance; [1] additive by additive variance; [2] residual variance
+# Srep 1-3 is same to exact test
 
 # Step 4: Randomly select 100,000 SNP pairs
 snp_df = pd.read_csv(bed_file + '.bim', header=None, sep='\s+')
@@ -156,20 +153,69 @@ random_pair(num_snp, out_file='random_pair', num_pair=100000, num_each_pair=5000
 
 # step 5: Test these 100,000 SNP pairs
 # note: set p_cut=1 to save all the results
-remma_epiAA_pair_cpu(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, snp_pair_file="random_pair", max_test_pair=50000, p_cut=1, out_file='remma_epiAA_pair_cpu_random')
+remma_epiAA_pair_cpu(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, snp_pair_file="random_pair", 
+                     max_test_pair=50000, p_cut=1, out_file='remma_epiAA_pair_cpu_random')
 
 # step 6: Calculate the median of variances for estimated epistatic SNP effects
 res_df = pd.read_csv('remma_epiAA_pair_cpu_random', header=0, sep='\s+')
 print(np.median(res_df['p']))  # P value close to 0.5. It means type I error controlled well
 var_median = np.median(res_df['var'])  # median of variances for estimated epistatic SNP effects
 
-# step 7: Screen the effects and select top SNP pairs based of effect cut
-remma_epiAA_eff_cpu_c(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, snp_lst_0=None, var_app=var_median, p_cut=1e-05, out_file='remma_epiAA_eff_cpu_c')
+# step 7: Screen the effects and select top SNP pairs based on approximate test. 
+# Use the above median of variances as the approximate values (var_app = var_median)
+remma_epiAA_eff_cpu_c(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, var_app=var_median, 
+                      p_cut=1e-05, out_file='remma_epiAA_eff_cpu_c')
 
-# Step 8: Calculate p values for top SNP pairs
-remma_epiAA_pair_cpu(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, snp_pair_file="remma_epiAA_eff_cpu_c", max_test_pair=50000, p_cut=1, out_file='remma_epiAA_pair_cpu_res')
+# Step 8: Calculate exact p values for top SNP pairs
+remma_epiAA_pair_cpu(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, snp_pair_file="remma_epiAA_eff_cpu_c", 
+                     max_test_pair=50000, p_cut=1, out_file='remma_epiAA_pair_cpu_res')
 
 # Step 9: Select top SNPs and add the SNP position
 res_file = 'remma_epiAA_pair_cpu_res'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
+
+```
+
+#### parallel 
+Analysis can be subdivided with remma_epiAA_eff_cpu_c_parallel and run parallelly on different machines.
+
+
+```python
+# Srep 1-6 is same to the above
+# Step 7: parallel test. Write the codes in separate scripts and run separately.
+from gmat.remma.remma_cpu.remma_epiAA_cpu import remma_epiAA_eff_cpu_c_parallel
+remma_epiAA_eff_cpu_c_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel=[3,1], 
+                               var_app=var_median, p_cut=1.0e-5, out_file='remma_epiAA_eff_cpu_c')
+remma_epiAA_eff_cpu_c_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel=[3,2], 
+                               var_app=var_median, p_cut=1.0e-5, out_file='remma_epiAA_eff_cpu_c')
+remma_epiAA_eff_cpu_c_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel=[3,3], 
+                               var_app=var_median, p_cut=1.0e-5, out_file='remma_epiAA_eff_cpu_c')
+
+# Step 8: Calculate exact p values for top SNP pairs
+remma_epiAA_pair_cpu(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, snp_pair_file="remma_epiAA_eff_cpu_c.1", 
+                     max_test_pair=50000, p_cut=1, out_file='remma_epiAA_pair_cpu_res.1')
+remma_epiAA_pair_cpu(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, snp_pair_file="remma_epiAA_eff_cpu_c.2", 
+                     max_test_pair=50000, p_cut=1, out_file='remma_epiAA_pair_cpu_res.2')
+remma_epiAA_pair_cpu(y, xmat, zmat, gmat_lst, var_com=var_com_a_axa, bed_file=bed_file, snp_pair_file="remma_epiAA_eff_cpu_c.3", 
+                     max_test_pair=50000, p_cut=1, out_file='remma_epiAA_pair_cpu_res.3')
+
+# Step 9: Merge files 'remma_epiAA_pair_cpu_res.1', 'remma_epiAA_pair_cpu_res.2' and 'remma_epiAA_pair_cpu_res.3' 
+# with the following codes.
+fout = open("remma_epiAA_pair_cpu_res.merge", 'w')
+fin = open('remma_epiAA_pair_cpu_res.1')
+head_line = fin.readline()
+fout.write(head_line)
+fin.close()
+for i in range(1, 4):
+    fin = open('remma_epiAA_pair_cpu_res.' + str(i))
+    head_line = fin.readline()
+    for line in fin:
+        fout.write(line)
+    fin.close()
+fout.close()
+
+# Step 10: Select top SNPs and add the SNP position
+res_file = 'remma_epiAA_pair_cpu_res.merge'  # result file
+annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
+
 ```

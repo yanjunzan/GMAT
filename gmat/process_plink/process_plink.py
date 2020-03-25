@@ -10,9 +10,18 @@ def read_plink(bed_file):
 
 
 def impute_geno(snp_mat):
-    ind = np.where(np.isnan(snp_mat))
-    ind_len = len(ind[0])
-    snp_mat.val[ind] = np.random.choice([0.0, 1.0, 2.0], ind_len)
+    ind_na = np.where(np.isnan(snp_mat))
+    col_na = set(ind_na[1])  # get col number where na exist
+    for i in tqdm(col_na):
+        snpi = snp_mat[:, i]
+        code0 = np.sum(np.absolute(snpi - 0.0) < 1e-10)
+        code1 = np.sum(np.absolute(snpi - 1.0) < 1e-10)
+        code2 = np.sum(np.absolute(snpi - 2.0) < 1e-10)
+        code_count = code0 + code1 + code2
+        p_lst = [code0/code_count, code1/code_count, code2/code_count]
+        icol_na = np.where(np.isnan(snpi))
+        snpi = np.random.choice([0.0, 1.0, 2.0], len(icol_na[0]), p=p_lst)
+        snp_mat[:, i] = snpi
     return snp_mat
 
 
