@@ -92,7 +92,7 @@ res_file = 'remma_epiAA_cpu'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
 ```
 
-#### parallel 
+#### （2）Parallel exact test  (for small data)
 Analysis can be subdivided with remma_epiAA_cpu_parallel and run parallelly on different machines.
 
 
@@ -126,7 +126,7 @@ res_file = 'remma_epiAA_cpu.merge'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
 ```
 
-#### (2) approximate test (recommended for big data)
+#### (3) approximate test (recommended for big data)
 
 
 ```python
@@ -177,7 +177,7 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
 
 ```
 
-#### parallel 
+#### (4) Parallel approximate test (recommended for big data)
 Analysis can be subdivided with remma_epiAA_eff_cpu_c_parallel and run parallelly on different machines.
 
 
