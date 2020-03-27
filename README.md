@@ -1,9 +1,21 @@
 
-# 1. Contact: Chao Ning
+* [1 Contact: Chao Ning](#1-Contact:-Chao-Ning)
+* [2 Install](#2-Install)
+ * [2.1 Dependencies](#2.1-Dependencies)
+ * [2.2 Quick install](#2.2-Quick install)
+ * [2.3 Detailed Package Install Instructions](#2.3-Detailed-Package-Install-Instructions)
+* [3 REMMAX function](#3-REMMAX-function)
+ * [3.1 Format of the input file](#3.1-Format-of-the-input-file)
+ * [3.2 Exhaustive additive by addtive epistatis](#3.2-Exhaustive-additive-by-addtive-epistatis)
+   * [3.2.1 Include additive and additive by additive genomic relationship matrix](#3.2.1-Include-additive-and-additive-by-additive-genomic-relationship-matrix)
+   * [3.2.2 Include additive, dominance and additive by additive genomic relationship matrix](#3.2.2-Include-additive,-dominance-and-additive-by-additive-genomic-relationship-matrix)
+  
+
+# 1 Contact: Chao Ning
 ningchao(at)sdau(dot)edu(dot)cn  
 ningchao91(at)gmail(dot)com  
 
-# 2. Install
+# 2 Install
 GMAT will keep updating. Please uninstall older version to obtain the latest functions. The easiest uninstall way:  
 \> pip uninstall gmat
 
@@ -20,7 +32,7 @@ We recommend using a Python distribution such as [Anaconda](https://www.anaconda
 ## 2.2 Quick install
 \> pip install gmat  
 
-## 2.3 Detailed Package Install Instructions:
+## 2.3 Detailed Package Install Instructions
 (1) Install the dependent packages  
 (2) Go to the directory of GMAT and type  
 \> python setup.py install  
@@ -32,7 +44,7 @@ Rapid Epistatic Mixed Model Association Studies
 * Dan Wang, Hui Tang, Jian-Feng Liu, Shizhong Xu, Qin Zhang and Chao Ning. Rapid Epistatic Mixed Model Association Studies by Controlling Multiple Polygenic Effects. BioRxiv, 2020. doi: https://doi.org/10.1101/2020.03.05.976498  
 * Chao Ning, Dan Wang, Huimin Kang, Raphael Mrode, Lei Zhou, Shizhong Xu, Jian-Feng Liu. A rapid epistatic mixed-model association analysis by linear retransformations of genomic estimated values. Bioinformatics, 2018, 34(11): 1817-1825.  
 
-## 3.1 Format of the input file.
+## 3.1 Format of the input file
 * Plink binary file including \*.bed, \*.bim and \*.fam.  
 Missing genotypes are recommended to impute with Beagle or other softwares, although they will be imputed according the frequency of occurrence locus by locus.   
 
@@ -54,7 +66,7 @@ An example phenotypic file with four covariates (population mean, sex, age, trea
 ## 3.2 Exhaustive additive by addtive epistatis  
 Data: Mouse data in directory of GMAT/examples/data/mouse    
 
-### 3.2.1 Example 1: Include additive and additive by additive genomic relationship matrix
+### 3.2.1 Include additive and additive by additive genomic relationship matrix
 #### (1)  Exact test (for small data)
 
 
@@ -91,7 +103,7 @@ res_file = 'epiAA_a_axa'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
 ```
 
-#### （2）Parallel exact test  (for small data)
+#### (2) Parallel exact test  (for small data)
 Analysis can be subdivided with remma_epiAA_cpu_parallel and run parallelly on different machines.
 
 
@@ -220,7 +232,7 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
 
 ```
 
-### 3.2.2 Example 2: Include additive, dominance and additive by additive genomic relationship matrix
+### 3.2.2 Include additive, dominance and additive by additive genomic relationship matrix
 #### (1) Exact test (for small data)
 
 
@@ -258,7 +270,7 @@ res_file = 'epiAA_a_d_axa'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
 ```
 
-#### （2）Parallel exact test (for small data)
+#### (2) Parallel exact test (for small data)
 Analysis can be subdivided with remma_epiAA_cpu_parallel and run parallelly on different machines.
 
 
