@@ -2,14 +2,14 @@
 # Contents
 * [1 Contact](#1-Contact)
 * [2 Install](#2-Install)
- * [2.1 Dependencies](#2.1-Dependencies)
- * [2.2 Quick install](#2.2-Quick-install)
- * [2.3 Detailed Package Install Instructions](#2.3-Detailed-Package-Install-Instructions)
+ * [2.1 Dependencies](#21-Dependencies)
+ * [2.2 Quick install](#22-Quick-install)
+ * [2.3 Detailed Package Install Instructions](#23-Detailed-Package-Install-Instructions)
 * [3 REMMAX function](#3-REMMAX-function)
- * [3.1 Format of the input file](#3.1-Format-of-the-input-file)
- * [3.2 Exhaustive additive by addtive epistatis](#3.2-Exhaustive-additive-by-addtive-epistatis)
-   * [3.2.1 Include additive and additive by additive genomic relationship matrix](#3.2.1-Include-additive-and-additive-by-additive-genomic-relationship-matrix)
-   * [3.2.2 Include additive, dominance and additive by additive genomic relationship matrix](#3.2.2-Include-additive,-dominance-and-additive-by-additive-genomic-relationship-matrix)
+ * [3.1 Format of the input file](#31-Format-of-the-input-file)
+ * [3.2 Exhaustive additive by addtive epistatis](#32-Exhaustive-additive-by-addtive-epistatis)
+   * [3.2.1 Include additive and additive by additive genomic relationship matrix](#321-Include-additive-and-additive-by-additive-genomic-relationship-matrix)
+   * [3.2.2 Include additive, dominance and additive by additive genomic relationship matrix](#322-Include-additive-dominance-and-additive-by-additive-genomic-relationship-matrix)
   
 
 # 1 Contact
