@@ -1,8 +1,9 @@
 
+# Contents
 * [1 Contact: Chao Ning](#1-Contact:-Chao-Ning)
 * [2 Install](#2-Install)
  * [2.1 Dependencies](#2.1-Dependencies)
- * [2.2 Quick install](#2.2-Quick install)
+ * [2.2 Quick install](#2.2-Quick-install)
  * [2.3 Detailed Package Install Instructions](#2.3-Detailed-Package-Install-Instructions)
 * [3 REMMAX function](#3-REMMAX-function)
  * [3.1 Format of the input file](#3.1-Format-of-the-input-file)
