@@ -9,8 +9,8 @@
   * [3.1 Format of the input file](#31-Format-of-the-input-file)
   * [3.2 Exhaustive additive by addtive epistatis](#32-Exhaustive-additive-by-addtive-epistatis)
     * [3.2.1 Include additive and additive by additive genomic relationship matrix](#321-Include-additive-and-additive-by-additive-genomic-relationship-matrix)
-    * [3.2.2 Include additive, dominance and additive by additive genomic relationship matrix](#322-Include-additive,-dominance-and-additive-by-additive-genomic-relationship-matrix)
-    * [3.2.3 Include additive, dominance and three kinds of epistatic genomic relationship matrix](#323-Include-additive,-dominance-and-three-kinds-of-epistatic-genomic-relationship-matrix)
+    * [3.2.2 Include additive, dominance and additive by additive genomic relationship matrix](#322-Include-additive-dominance-and-additive-by-additive-genomic-relationship-matrix)
+    * [3.2.3 Include additive, dominance and three kinds of epistatic genomic relationship matrix](#323-Include-additive-dominance-and-three-kinds-of-epistatic-genomic-relationship-matrix)
 
 # 1 Contact
 Chao Ning  
