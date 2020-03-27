@@ -1,6 +1,6 @@
 
 # Contents
-* [1 Contact: Chao Ning](#1-Contact:-Chao-Ning)
+* [1 Contact](#1-Contact)
 * [2 Install](#2-Install)
  * [2.1 Dependencies](#2.1-Dependencies)
  * [2.2 Quick install](#2.2-Quick-install)
@@ -12,7 +12,8 @@
    * [3.2.2 Include additive, dominance and additive by additive genomic relationship matrix](#3.2.2-Include-additive,-dominance-and-additive-by-additive-genomic-relationship-matrix)
   
 
-# 1 Contact: Chao Ning
+# 1 Contact
+Chao Ning  
 ningchao(at)sdau(dot)edu(dot)cn  
 ningchao91(at)gmail(dot)com  
 
