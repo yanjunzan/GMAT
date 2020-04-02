@@ -32,7 +32,7 @@ def annotation_snp_pos(res_file, bed_file, p_cut=1, dis=0):
     """
     snp_info = {}
     order = -1
-    with open(bed_file, 'r') as fin:
+    with open(bed_file + '.bim', 'r') as fin:
         for line in fin:
             order += 1
             arr = line.split()

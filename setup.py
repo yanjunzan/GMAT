@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
 setup(
-    cffi_modules=["gmat/remma/remma_cpu/_build.py:ffi", "gmat/process_plink/_build.py:ffi"],
+    cffi_modules=["gmat/remma/_build.py:ffi", "gmat/process_plink/_build.py:ffi"],
     name='gmat',
-    version='2020.3.26',
+    version='2020.4.1',
     description='Genomic Multivariate Analysis Tools',
     long_description=open('README.md').read(),
     long_description_content_type="text/markdown",
@@ -22,7 +22,4 @@ setup(
         #'pysnptools>=0.4.11',
         'tqdm>=4.43.0',
     ],
-
 )
-
-
