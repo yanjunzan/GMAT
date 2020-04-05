@@ -12,7 +12,7 @@ from scipy.stats import chi2
 from gmat.process_plink.process_plink import read_plink, impute_geno
 
 
-def remma_epiAD(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None, p_cut=0.0001, out_file='remma_epiAD'):
+def remma_epiAD(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None, p_cut=0.0001, out_file='epiAD'):
     """
     additive by dominance epistasis test by random SNP-BLUP model.
     :param y: phenotypic vector
@@ -90,7 +90,7 @@ def remma_epiAD(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None, p_cu
     return 0
 
 
-def remma_epiAD_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel, p_cut=1.0e-4, out_file='remma_epiAD__parallel'):
+def remma_epiAD_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel, p_cut=1.0e-4, out_file='epiAD__parallel'):
     """
     Parallel version. Additive by dominance epistasis test by random SNP-BLUP model.
     :param y: phenotypic vector

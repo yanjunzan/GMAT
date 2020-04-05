@@ -12,7 +12,7 @@ from scipy.stats import chi2
 from gmat.process_plink.process_plink import read_plink, impute_geno
 
 
-def remma_epiAA_pair(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_pair_file, max_test_pair=50000, p_cut=1.0e-4, out_file='remma_epiAA_pair'):
+def remma_epiAA_pair(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_pair_file, max_test_pair=50000, p_cut=1.0e-4, out_file='epiAA_pair'):
     """
     Given a SNP pair file, perform additive by additive epistasis test by random SNP-BLUP model.
     :param y: phenotypic vector

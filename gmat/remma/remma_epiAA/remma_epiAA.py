@@ -12,7 +12,7 @@ from scipy.stats import chi2
 from gmat.process_plink.process_plink import read_plink, impute_geno
 
 
-def remma_epiAA(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None, p_cut=1.0e-4, out_file='remma_epiAA'):
+def remma_epiAA(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None, p_cut=1.0e-4, out_file='epiAA'):
     """
     additive by additive epistasis test by random SNP-BLUP model.
     :param y: phenotypic vector
@@ -85,7 +85,7 @@ def remma_epiAA(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None, p_cu
     return 0
 
 
-def remma_epiAA_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel, p_cut=1.0e-4, out_file='remma_epiAA_parallel'):
+def remma_epiAA_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel, p_cut=1.0e-4, out_file='epiAA_parallel'):
     """
     Parallel version. Additive by additive epistasis test by random SNP-BLUP model.
     :param y: phenotypic vector

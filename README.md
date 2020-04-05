@@ -11,7 +11,8 @@
     * [3.2.1 Include additive and additive by additive genomic relationship matrix](#321-Include-additive-and-additive-by-additive-genomic-relationship-matrix)
     * [3.2.2 Include additive, dominance and additive by additive genomic relationship matrix](#322-Include-additive-dominance-and-additive-by-additive-genomic-relationship-matrix)
     * [3.2.3 Include additive, dominance and three kinds of epistatic genomic relationship matrix](#323-Include-additive-dominance-and-three-kinds-of-epistatic-genomic-relationship-matrix)
-  * [3.2 Exhaustive additive by dominance epistatis](#32-Exhaustive-additive-by-dominance-epistatis)
+  * [3.3 Exhaustive additive by dominance epistatis](#33-Exhaustive-additive-by-dominance-epistatis)
+  * [3.4 Exhaustive dominance by dominance epistatis](#34-Exhaustive-dominance-by-dominance-epistatis)
 
 # 1 Contact
 Chao Ning  
@@ -579,4 +580,351 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
 
 ```
 
-## 3.2 Exhaustive additive by dominance epistatis  
+## 3.3 Exhaustive additive by dominance epistatis  
+Include additive, dominance, additive by additive, additive by dominance and dominance by dominance genomic relationship matrix  
+#### (1) Exact test (for small data)
+
+
+```python
+import logging
+import numpy as np
+import pandas as pd
+from gmat.gmatrix import agmat, dgmat_as
+from gmat.uvlmm.design_matrix import design_matrix_wemai_multi_gmat
+from gmat.uvlmm.uvlmm_varcom import wemai_multi_gmat
+from gmat.remma.remma_epiAD import remma_epiAD, remma_epiAD_parallel
+from gmat.remma import annotation_snp_pos
+logging.basicConfig(level=logging.INFO)
+
+pheno_file = 'pheno'
+bed_file = 'plink'
+
+# Step 1: Calculate the genomic relationship matrix
+agmat_lst = agmat(bed_file, inv=False) # additive genomic relationship matrix
+dgmat_lst = dgmat_as(bed_file, inv=False) # dominace genomic relationship matrix
+
+# Step 2: Prepare the phenotypic vector (y), designed matrix for fixed effects (xmat) and designed matrix for random effects (zmat)
+y, xmat, zmat = design_matrix_wemai_multi_gmat(pheno_file, bed_file)
+
+# Step 3: Estimate the variances
+# agmat_lst[0]*agmat_lst[0] is the additive by additive genomic relationship matrix
+# agmat_lst[0]*dgmat_lst[0] is the additive by dominance genomic relationship matrix
+# dgmat_lst[0]*dgmat_lst[0] is the dominance by dominance genomic relationship matrix
+gmat_lst = [agmat_lst[0], dgmat_lst[0], agmat_lst[0]*agmat_lst[0], agmat_lst[0]*dgmat_lst[0], dgmat_lst[0]*dgmat_lst[0]]  
+
+var_com_all = wemai_multi_gmat(y, xmat, zmat, gmat_lst)
+print(var_com_all)  
+"""
+a list： [0] addtive variance; [1] dominace variance [2] additive by additive variance; [3] additive by dominance variance; 
+[4] dominance by dominance variance; [5] residual variance
+"""
+
+# Step 4: Test
+remma_epiAD(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, p_cut=0.0001, out_file='epiAD')
+
+# Step 5: Select top SNPs and add the SNP position
+res_file = 'remma_epiAD'  # result file
+annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
+
+```
+
+#### (2) Parallel exact test (for small data)
+Analysis can be subdivided with remma_epiAD_parallel and run parallelly on different machines.
+
+
+```python
+# Step 1-3 is same to the above
+
+# Step 4: parallel test. Write the codes in separate scripts and run separately.
+from gmat.remma.remma_epiAD import remma_epiAD_parallel
+remma_epiAD_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, parallel=[3,1], 
+                         p_cut=0.0001, out_file='epiAD_parallel')
+remma_epiAD_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, parallel=[3,2], 
+                         p_cut=0.0001, out_file='epiAD_parallel')
+remma_epiAD_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, parallel=[3,3], 
+                         p_cut=0.0001, out_file='epiAD_parallel')
+
+# Step 5: Merge files 'epiAD_parallel.1', 'epiAD_parallel.2' and 'epiAD_parallel.3' with the following codes.
+prefix = 'epiAD_parallel'
+parallel_num = 3  # the number of parallels
+with open(prefix + ".merge", 'w') as fout:
+    with open(prefix + '.1') as fin:
+        head_line = fin.readline()
+        fout.write(head_line)
+    for i in range(1, parallel_num+1):
+        with open(prefix + '.' + str(i)) as fin:
+            head_line = fin.readline()
+            for line in fin:
+                fout.write(line)
+
+# Step 6: Select top SNPs and add the SNP position
+res_file = 'epiAD_parallel.merge'  # result file
+annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
+```
+
+#### (3) approximate test (recommended for big data)
+
+
+```python
+import logging
+import numpy as np
+import pandas as pd
+from scipy.stats import chi2
+from gmat.gmatrix import agmat, dgmat_as
+from gmat.uvlmm.design_matrix import design_matrix_wemai_multi_gmat
+from gmat.uvlmm.uvlmm_varcom import wemai_multi_gmat
+from gmat.remma import random_pairAD
+from gmat.remma.remma_epiAD import remma_epiAD_pair, remma_epiAD_eff, remma_epiAD_eff_parallel
+from gmat.remma import annotation_snp_pos
+logging.basicConfig(level=logging.INFO)
+
+pheno_file = 'pheno'  # phenotypic file
+bed_file = 'plink'  # the prefix for the plink binary file
+
+# Step 1-3 is same to exact test
+
+# Step 4: Randomly select 100,000 SNP pairs
+snp_df = pd.read_csv(bed_file + '.bim', header=None, sep='\s+')
+num_snp = snp_df.shape[0]  # the number of snp
+random_pairAD(num_snp, out_file='random_pairAD', num_pair=100000, num_each_pair=5000)
+
+# step 5: Test these 100,000 SNP pairs
+# note: set p_cut=1 to save all the results
+remma_epiAD_pair(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, snp_pair_file="random_pairAD", 
+                     max_test_pair=50000, p_cut=1, out_file='epiAD_pair_random')
+
+# step 6: Calculate the median of variances for estimated epistatic SNP effects
+res_df = pd.read_csv('epiAD_pair_random', header=0, sep='\s+')
+print(np.median(res_df['p']))  # P value close to 0.5. It means type I error controlled well
+var_median = np.median(res_df['var'])  # median of variances for estimated epistatic SNP effects
+
+# step 7: Screen the effects and select top SNP pairs based on approximate test. 
+# Use the above median of variances as the approximate values (var_app = var_median)
+remma_epiAD_eff(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, var_app=var_median, 
+                      p_cut=1e-05, out_file='epiAD_eff')
+
+# Step 8: Calculate exact p values for top SNP pairs
+remma_epiAD_pair(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, snp_pair_file="epiAD_eff", 
+                     max_test_pair=50000, p_cut=1, out_file='epiAD_pair_res')
+
+# Step 9: Select top SNPs and add the SNP position
+res_file = 'epiAD_pair_res'  # result file
+annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
+```
+
+#### (4) Parallel approximate test (recommended for big data)
+Analysis can be subdivided with remma_epiAD_eff_parallel and run parallelly on different machines.
+
+
+```python
+# Step 1-6 is same to the above
+
+# Step 7: parallel test. Write the codes in separate scripts and run separately.
+from gmat.remma.remma_epiAD import remma_epiAD_eff_parallel
+remma_epiAD_eff_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, parallel=[3,1], 
+                               var_app=var_median, p_cut=1.0e-5, out_file='epiAD_eff_parallel')
+remma_epiAD_eff_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, parallel=[3,2], 
+                               var_app=var_median, p_cut=1.0e-5, out_file='epiAD_eff_parallel')
+remma_epiAD_eff_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, parallel=[3,3], 
+                               var_app=var_median, p_cut=1.0e-5, out_file='epiAD_eff_parallel')
+
+# Step 8: Calculate exact p values for top SNP pairs
+remma_epiAD_pair(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, snp_pair_file="epiAD_eff_parallel.1", 
+                     max_test_pair=50000, p_cut=1, out_file='epiAD_pair_res.1')
+remma_epiAD_pair(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, snp_pair_file="epiAD_eff_parallel.2", 
+                     max_test_pair=50000, p_cut=1, out_file='epiAD_pair_res.2')
+remma_epiAD_pair(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, snp_pair_file="epiAD_eff_parallel.3", 
+                     max_test_pair=50000, p_cut=1, out_file='epiAD_pair_res.3')
+
+# Step 9: Merge files 'epiAD_pair_res.1', 'epiAD_pair_res.2' and 'epiAD_pair_res.3' 
+# with the following codes.
+prefix = 'epiAD_pair_res'
+parallel_num = 3  # the number of parallels
+with open(prefix + ".merge", 'w') as fout:
+    with open(prefix + '.1') as fin:
+        head_line = fin.readline()
+        fout.write(head_line)
+    for i in range(1, parallel_num+1):
+        with open(prefix + '.' + str(i)) as fin:
+            head_line = fin.readline()
+            for line in fin:
+                fout.write(line)
+
+# Step 10: Select top SNPs and add the SNP position
+res_file = 'epiAD_pair_res.merge'  # result file
+annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
+```
+
+## 3.4 Exhaustive dominance by dominance epistatis  
+Include additive, dominance, additive by additive, additive by dominance and dominance by dominance genomic relationship matrix  
+#### (1) Exact test (for small data)
+
+
+```python
+import logging
+import numpy as np
+import pandas as pd
+from gmat.gmatrix import agmat, dgmat_as
+from gmat.uvlmm.design_matrix import design_matrix_wemai_multi_gmat
+from gmat.uvlmm.uvlmm_varcom import wemai_multi_gmat
+from gmat.remma.remma_epiDD import remma_epiDD, remma_epiDD_parallel
+from gmat.remma import annotation_snp_pos
+logging.basicConfig(level=logging.INFO)
+
+pheno_file = 'pheno'
+bed_file = 'plink'
+
+# Step 1: Calculate the genomic relationship matrix
+agmat_lst = agmat(bed_file, inv=False) # additive genomic relationship matrix
+dgmat_lst = dgmat_as(bed_file, inv=False) # dominace genomic relationship matrix
+
+# Step 2: Prepare the phenotypic vector (y), designed matrix for fixed effects (xmat) and designed matrix for random effects (zmat)
+y, xmat, zmat = design_matrix_wemai_multi_gmat(pheno_file, bed_file)
+
+# Step 3: Estimate the variances
+# agmat_lst[0]*agmat_lst[0] is the additive by additive genomic relationship matrix
+# agmat_lst[0]*dgmat_lst[0] is the additive by dominance genomic relationship matrix
+# dgmat_lst[0]*dgmat_lst[0] is the dominance by dominance genomic relationship matrix
+gmat_lst = [agmat_lst[0], dgmat_lst[0], agmat_lst[0]*agmat_lst[0], agmat_lst[0]*dgmat_lst[0], dgmat_lst[0]*dgmat_lst[0]]  
+
+var_com_all = wemai_multi_gmat(y, xmat, zmat, gmat_lst)
+print(var_com_all)  
+"""
+a list： [0] addtive variance; [1] dominace variance [2] additive by additive variance; [3] additive by dominance variance; 
+[4] dominance by dominance variance; [5] residual variance
+"""
+
+# Step 4: Test
+remma_epiDD(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, p_cut=0.0001, out_file='epiDD')
+
+# Step 5: Select top SNPs and add the SNP position
+res_file = 'remma_epiDD'  # result file
+annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
+```
+
+#### (2) Parallel exact test (for small data)
+Analysis can be subdivided with remma_epiDD_parallel and run parallelly on different machines.
+
+
+```python
+# Step 1-3 is same to the above
+
+# Step 4: parallel test. Write the codes in separate scripts and run separately.
+from gmat.remma.remma_epiDD import remma_epiDD_parallel
+remma_epiDD_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, parallel=[3,1], 
+                         p_cut=0.0001, out_file='epiDD_parallel')
+remma_epiDD_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, parallel=[3,2], 
+                         p_cut=0.0001, out_file='epiDD_parallel')
+remma_epiDD_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, parallel=[3,3], 
+                         p_cut=0.0001, out_file='epiDD_parallel')
+
+# Step 5: Merge files 'epiAD_parallel.1', 'epiAD_parallel.2' and 'epiAD_parallel.3' with the following codes.
+prefix = 'epiDD_parallel'
+parallel_num = 3  # the number of parallels
+with open(prefix + ".merge", 'w') as fout:
+    with open(prefix + '.1') as fin:
+        head_line = fin.readline()
+        fout.write(head_line)
+    for i in range(1, parallel_num+1):
+        with open(prefix + '.' + str(i)) as fin:
+            head_line = fin.readline()
+            for line in fin:
+                fout.write(line)
+
+# Step 6: Select top SNPs and add the SNP position
+res_file = 'epiDD_parallel.merge'  # result file
+annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
+```
+
+#### (3) approximate test (recommended for big data)
+
+
+```python
+import logging
+import numpy as np
+import pandas as pd
+from scipy.stats import chi2
+from gmat.gmatrix import agmat, dgmat_as
+from gmat.uvlmm.design_matrix import design_matrix_wemai_multi_gmat
+from gmat.uvlmm.uvlmm_varcom import wemai_multi_gmat
+from gmat.remma import random_pair
+from gmat.remma.remma_epiDD import remma_epiDD_pair, remma_epiDD_eff, remma_epiDD_eff_parallel
+from gmat.remma import annotation_snp_pos
+logging.basicConfig(level=logging.INFO)
+
+pheno_file = 'pheno'  # phenotypic file
+bed_file = 'plink'  # the prefix for the plink binary file
+
+# Step 1-3 is same to exact test
+
+# Step 4: Randomly select 100,000 SNP pairs
+snp_df = pd.read_csv(bed_file + '.bim', header=None, sep='\s+')
+num_snp = snp_df.shape[0]  # the number of snp
+random_pair(num_snp, out_file='random_pair', num_pair=100000, num_each_pair=5000)
+
+# step 5: Test these 100,000 SNP pairs
+# note: set p_cut=1 to save all the results
+remma_epiDD_pair(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, snp_pair_file="random_pair", 
+                     max_test_pair=50000, p_cut=1, out_file='epiDD_pair_random')
+
+# step 6: Calculate the median of variances for estimated epistatic SNP effects
+res_df = pd.read_csv('epiDD_pair_random', header=0, sep='\s+')
+print(np.median(res_df['p']))  # P value close to 0.5. It means type I error controlled well
+var_median = np.median(res_df['var'])  # median of variances for estimated epistatic SNP effects
+
+# step 7: Screen the effects and select top SNP pairs based on approximate test. 
+# Use the above median of variances as the approximate values (var_app = var_median)
+remma_epiDD_eff(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, var_app=var_median, 
+                      p_cut=1e-05, out_file='epiDD_eff')
+
+# Step 8: Calculate exact p values for top SNP pairs
+remma_epiDD_pair(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, snp_pair_file="epiDD_eff", 
+                     max_test_pair=50000, p_cut=1, out_file='epiDD_pair_res')
+
+# Step 9: Select top SNPs and add the SNP position
+res_file = 'epiDD_pair_res'  # result file
+annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
+```
+
+#### (4) Parallel approximate test (recommended for big data)
+Analysis can be subdivided with remma_epiAD_eff_parallel and run parallelly on different machines.
+
+
+```python
+# Step 1-6 is same to the above
+
+# Step 7: parallel test. Write the codes in separate scripts and run separately.
+from gmat.remma.remma_epiDD import remma_epiDD_eff_parallel
+remma_epiDD_eff_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, parallel=[3,1], 
+                               var_app=var_median, p_cut=1.0e-5, out_file='epiDD_eff_parallel')
+remma_epiDD_eff_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, parallel=[3,2], 
+                               var_app=var_median, p_cut=1.0e-5, out_file='epiDD_eff_parallel')
+remma_epiDD_eff_parallel(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, parallel=[3,3], 
+                               var_app=var_median, p_cut=1.0e-5, out_file='epiDD_eff_parallel')
+
+# Step 8: Calculate exact p values for top SNP pairs
+remma_epiDD_pair(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, snp_pair_file="epiDD_eff_parallel.1", 
+                     max_test_pair=50000, p_cut=1, out_file='epiDD_pair_res.1')
+remma_epiDD_pair(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, snp_pair_file="epiDD_eff_parallel.2", 
+                     max_test_pair=50000, p_cut=1, out_file='epiDD_pair_res.2')
+remma_epiDD_pair(y, xmat, zmat, gmat_lst, var_com=var_com_all, bed_file=bed_file, snp_pair_file="epiDD_eff_parallel.3", 
+                     max_test_pair=50000, p_cut=1, out_file='epiDD_pair_res.3')
+
+# Step 9: Merge files 'epiAD_pair_res.1', 'epiAD_pair_res.2' and 'epiAD_pair_res.3' 
+# with the following codes.
+prefix = 'epiDD_pair_res'
+parallel_num = 3  # the number of parallels
+with open(prefix + ".merge", 'w') as fout:
+    with open(prefix + '.1') as fin:
+        head_line = fin.readline()
+        fout.write(head_line)
+    for i in range(1, parallel_num+1):
+        with open(prefix + '.' + str(i)) as fin:
+            head_line = fin.readline()
+            for line in fin:
+                fout.write(line)
+
+# Step 10: Select top SNPs and add the SNP position
+res_file = 'epiDD_pair_res.merge'  # result file
+annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5)
+```

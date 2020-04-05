@@ -16,7 +16,7 @@ from gmat.process_plink.process_plink import read_plink, impute_geno
 from _cremma_epi_eff_cpu import ffi, lib
 
 
-def remma_epiAA_eff(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None, var_app=1.0, p_cut=1.0e-5, out_file='remma_epiAA_eff'):
+def remma_epiAA_eff(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None, var_app=1.0, p_cut=1.0e-5, out_file='epiAA_eff'):
     """
     Estimate additive by additive epistasis effects by random SNP-BLUP model.
     :param y: phenotypic vector
@@ -96,7 +96,7 @@ def remma_epiAA_eff(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None, 
 
 
 def remma_epiAA_eff_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel,
-                                   var_app=1.0, p_cut=1.0e-5, out_file='remma_epiAA_eff_parallel'):
+                                   var_app=1.0, p_cut=1.0e-5, out_file='epiAA_eff_parallel'):
     """
     Parallel version. Additive by additive epistasis test by random SNP-BLUP model.
     :param y: phenotypic vector
