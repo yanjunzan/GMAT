@@ -2,9 +2,10 @@ import numpy as np
 from functools import reduce
 import gc
 import logging
+from gmat.uvlmm.design_matrix import design_matrix_wemai_multi_gmat
 
 
-def wemai_multi_gmat(y, xmat, zmat, gmat_lst, init=None, maxiter=200, cc_par=1.0e-8, cc_gra=1.0e-6):
+def _wemai_multi_gmat(y, xmat, zmat, gmat_lst, init=None, maxiter=200, cc_par=1.0e-8, cc_gra=1.0e-6):
     """
     Estimate variances for univariate linear mixed model. Multiple genomic relationship matrixes can be included.
     Weighted EM an AI algorithm are used.
@@ -100,6 +101,28 @@ def wemai_multi_gmat(y, xmat, zmat, gmat_lst, init=None, maxiter=200, cc_par=1.0
         logging.info('Variances converged.')
     else:
         logging.info('Variances not converged.')
+    return var_com
+
+
+def wemai_multi_gmat(pheno_file, bed_file, gmat_lst, init=None, maxiter=200, cc_par=1.0e-8, cc_gra=1.0e-6, out_file='wemai_multi_gmat.var'):
+    """
+    Estimate variances for univariate linear mixed model. Multiple genomic relationship matrixes can be included.
+    Weighted EM an AI algorithm are used.
+    :param pheno_file: phenotypic file. The fist two columns are family id, individual id which are same as plink *.fam
+    file. The third column is always ones for population mean. The last column is phenotypic values. The ohter covariate
+    can be added between columns for population mean and phenotypic values.
+    :param bed_file: the prefix for binary file
+    :param gmat_lst: a list of genomic relationship matrixes.
+    :param init: initial values for variances. default value is None.
+    :param maxiter: the maximal number of interactions. default value is 200.
+    :param cc_par: The convergence criteria for update vector.
+    :param cc_gra: The convergence criteria for gradient vector
+    :param out_file: output file to save the estimated variances
+    :return: the estimated variances
+    """
+    y, xmat, zmat = design_matrix_wemai_multi_gmat(pheno_file, bed_file)
+    var_com = _wemai_multi_gmat(y, xmat, zmat, gmat_lst, init=init, maxiter=maxiter, cc_par=cc_par, cc_gra=cc_gra)
+    np.savetxt(out_file, var_com)
     return var_com
 
 

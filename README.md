@@ -206,8 +206,7 @@ import numpy as np
 import pandas as pd
 from gmat.gmatrix import agmat
 from gmat.uvlmm.uvlmm_varcom import wemai_multi_gmat
-from gmat.remma import random_pair
-from gmat.remma.remma_epiAA import remma_epiAA_pair, remma_epiAA_eff
+from gmat.remma.remma_epiAA import remma_epiAA_approx
 from gmat.remma import annotation_snp_pos
 
 # Step 1: Calculate the genomic relationship matrix
@@ -220,35 +219,17 @@ ag = np.loadtxt(bed_file + '.agrm0')  # load the additive genomic relationship m
 gmat_lst = [ag, ag*ag]  # ag*ag is the additive by additive genomic relationship matrix
 wemai_multi_gmat(pheno_file, bed_file, gmat_lst, out_file='var_a_axa.txt')
 
-# Step 3: Randomly select 100,000 SNP pairs
-snp_df = pd.read_csv(bed_file + '.bim', header=None, sep='\s+')
-num_snp = snp_df.shape[0]  # the number of snp
-random_pair(num_snp, out_file='random_pair', num_pair=100000)
-
-# step 4: Test these 100,000 SNP pairs
-# note: set p_cut=1 to save all the results
-var_com = np.loadtxt('var_a_axa.txt')
-remma_epiAA_pair(pheno_file, bed_file, gmat_lst, var_com, snp_pair_file='random_pair', p_cut=1, out_file='epiAA_pair_random_a_axa')
-
-# step 5: Calculate the median of variances for estimated epistatic SNP effects
-res_df = pd.read_csv('epiAA_pair_random_a_axa', header=0, sep='\s+')
-print(np.median(res_df['p']))  # P value close to 0.5. It means type I error controlled well
-var_median = np.median(res_df['var'])  # median of variances for estimated epistatic SNP effects
-
-# step 6: Screen the effects and select top SNP pairs based on approximate test. 
-# Use the above median of variances as the approximate values (var_app = var_median)
-remma_epiAA_eff(pheno_file, bed_file, gmat_lst, var_com, var_app=var_median, p_cut=1e-05, out_file='epiAA_eff_a_axa')
-
-# Step 7: Calculate exact p values for top SNP pairs
-remma_epiAA_pair(pheno_file, bed_file, gmat_lst, var_com, snp_pair_file='epiAA_eff_a_axa', p_cut=0.0001, out_file='epiAA_pair_res_a_axa')
+# Step 3: Approximate test
+var_com = np.loadtxt('var_a_axa.txt')  # numpy array： [0] addtive variance; [1] additive by additive variance; [2] residual variance
+remma_epiAA_approx(pheno_file, bed_file, gmat_lst, var_com, p_cut=1.0e-5, num_random_pair=100000, out_file='epiAA_approx_a_axa')
 
 # Step 8: Select top SNPs and add the SNP position
-res_file = 'epiAA_pair_res_a_axa'  # result file
+res_file = 'epiAA_approx_a_axa.exact_p'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
 
 #### (4) Parallel approximate test (recommended for big data)
-Analysis can be subdivided with remma_epiAA_eff_parallel and run parallelly on different machines.
+Analysis can be subdivided with remma_epiAA_approx_parallel and run parallelly on different machines.
 
 
 ```python
@@ -257,10 +238,7 @@ logging.basicConfig(level=logging.INFO)
 import numpy as np
 import pandas as pd
 from gmat.gmatrix import agmat
-from gmat.uvlmm.design_matrix import design_matrix_wemai_multi_gmat
 from gmat.uvlmm.uvlmm_varcom import wemai_multi_gmat
-from gmat.remma import random_pair
-from gmat.remma.remma_epiAA import remma_epiAA_pair
 
 # Step 1: Calculate the genomic relationship matrix
 bed_file = 'plink'  # the prefix for the plink binary file
@@ -272,64 +250,50 @@ ag = np.loadtxt(bed_file + '.agrm0')  # load the additive genomic relationship m
 gmat_lst = [ag, ag*ag]  # ag*ag is the additive by additive genomic relationship matrix
 wemai_multi_gmat(pheno_file, bed_file, gmat_lst, out_file='var_a_axa.txt')
 
-# Step 3: Randomly select 100,000 SNP pairs
-snp_df = pd.read_csv(bed_file + '.bim', header=None, sep='\s+')
-num_snp = snp_df.shape[0]  # the number of snp
-random_pair(num_snp, out_file='random_pair', num_pair=100000)
-
-# step 4: Test these 100,000 SNP pairs
-# note: set p_cut=1 to save all the results
-var_com = np.loadtxt('var_a_axa.txt')
-remma_epiAA_pair(pheno_file, bed_file, gmat_lst, var_com, snp_pair_file='random_pair', p_cut=1, out_file='epiAA_pair_random_a_axa')
-
-# Step 5: parallel test. Write codes of thist step in separate scripts and run parallelly
-# Screen the effects and select top SNP pairs based on approximate test, then Calculate exact p values for top SNP pairs
+# Step 3: parallel approximate test. Write codes of thist step in separate scripts and run parallelly
 
 ## parallel 1
+import logging
+logging.basicConfig(level=logging.INFO)
 import numpy as np
-import pandas as pd
-from gmat.remma.remma_epiAA import remma_epiAA_eff_parallel, remma_epiAA_pair
-pheno_file = 'pheno'
+from gmat.remma.remma_epiAA import remma_epiAA_approx_parallel
 bed_file = 'plink'
+pheno_file = 'pheno'
+var_com = np.loadtxt('var_a_axa.txt')
 ag = np.loadtxt(bed_file + '.agrm0')
 gmat_lst = [ag, ag*ag]
-res_df = pd.read_csv('epiAA_pair_random_a_axa', header=0, sep='\s+')
-var_median = np.median(res_df['var'])
-var_com = np.loadtxt('var_a_axa.txt')
-remma_epiAA_eff_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 1], var_app=var_median, p_cut=1e-05, out_file='epiAA_eff_parallel_a_axa')
-remma_epiAA_pair(pheno_file, bed_file, gmat_lst, var_com, snp_pair_file='epiAA_eff_parallel_a_axa.1', p_cut=1, out_file='epiAA_pair_parallel_a_axa.1')
+# parallel=[3, 1] means divide total tests into three parts and run part 1
+remma_epiAA_approx_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 1], p_cut=1.0e-5, out_file='epiAA_approx_parallel')
 
 ## parallel 2
+import logging
+logging.basicConfig(level=logging.INFO)
 import numpy as np
-import pandas as pd
-from gmat.remma.remma_epiAA import remma_epiAA_eff_parallel, remma_epiAA_pair
-pheno_file = 'pheno'
+from gmat.remma.remma_epiAA import remma_epiAA_approx_parallel
 bed_file = 'plink'
+pheno_file = 'pheno'
+var_com = np.loadtxt('var_a_axa.txt')
 ag = np.loadtxt(bed_file + '.agrm0')
 gmat_lst = [ag, ag*ag]
-res_df = pd.read_csv('epiAA_pair_random_a_axa', header=0, sep='\s+')
-var_median = np.median(res_df['var'])
-var_com = np.loadtxt('var_a_axa.txt')
-remma_epiAA_eff_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 2], var_app=var_median, p_cut=1e-05, out_file='epiAA_eff_parallel_a_axa')
-remma_epiAA_pair(pheno_file, bed_file, gmat_lst, var_com, snp_pair_file='epiAA_eff_parallel_a_axa.2', p_cut=1, out_file='epiAA_pair_parallel_a_axa.2')
+# parallel=[3, 2] means divide total tests into three parts and run part 1
+remma_epiAA_approx_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 2], p_cut=1.0e-5, out_file='epiAA_approx_parallel')
 
 ## parallel 3
+import logging
+logging.basicConfig(level=logging.INFO)
 import numpy as np
-import pandas as pd
-from gmat.remma.remma_epiAA import remma_epiAA_eff_parallel, remma_epiAA_pair
-pheno_file = 'pheno'
+from gmat.remma.remma_epiAA import remma_epiAA_approx_parallel
 bed_file = 'plink'
+pheno_file = 'pheno'
+var_com = np.loadtxt('var_a_axa.txt')
 ag = np.loadtxt(bed_file + '.agrm0')
 gmat_lst = [ag, ag*ag]
-res_df = pd.read_csv('epiAA_pair_random_a_axa', header=0, sep='\s+')
-var_median = np.median(res_df['var'])
-var_com = np.loadtxt('var_a_axa.txt')
-remma_epiAA_eff_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 3], var_app=var_median, p_cut=1e-05, out_file='epiAA_eff_parallel_a_axa')
-remma_epiAA_pair(pheno_file, bed_file, gmat_lst, var_com, snp_pair_file='epiAA_eff_parallel_a_axa.3', p_cut=1, out_file='epiAA_pair_parallel_a_axa.3')
+# parallel=[3, 3] means divide total tests into three parts and run part 1
+remma_epiAA_approx_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 3], p_cut=1.0e-5, out_file='epiAA_approx_parallel')
 
-# Step 6: Merge files 'epiAA_pair_parallel_a_axa.*' 
+# Step 4: Merge files 'epiAA_approx_parallel.exact_p.*' 
 # with the following codes.
-prefix = 'epiAA_pair_parallel_a_axa'
+prefix = 'epiAA_approx_parallel.exact_p'
 parallel_num = 3  # the number of parallels
 with open(prefix + ".merge", 'w') as fout:
     with open(prefix + '.1') as fin:
@@ -341,9 +305,9 @@ with open(prefix + ".merge", 'w') as fout:
             for line in fin:
                 fout.write(line)
 
-# Step 7: Select top SNPs and add the SNP position
+# Step 5: Select top SNPs and add the SNP position
 from gmat.remma import annotation_snp_pos                   
-res_file = 'epiAA_pair_parallel_a_axa.merge'  # result file
+res_file = 'epiAA_approx_parallel.exact_p.merge'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
 

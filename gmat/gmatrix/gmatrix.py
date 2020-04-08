@@ -9,19 +9,29 @@ from gmat.process_plink.process_plink import read_plink, impute_geno
 
 def output_mat(mat, id, out_file, out_fmt):
     if out_fmt is 'mat':
-        np.savez(out_file + '0', mat=mat)
+        np.savetxt(out_file + '0', mat)
     elif out_fmt is 'row_col_val':
         ind = np.tril_indices_from(mat)
-        np.savez(out_file + '1', row=ind[0], col=ind[1], val=mat[ind])
+        df = pd.DataFrame({
+            "row": ind[0]+1,
+            "col": ind[1]+1,
+            "val": mat[ind]
+        })
+        df.to_csv(out_file + '1', sep=' ', index=False, header=False, columns=["row", "col", "val"])
     elif out_fmt is 'id_id_val':
         ind = np.tril_indices_from(mat)
-        np.savez(out_file + '2', id0=id[ind[0]], id1=id[ind[1]], val=mat[ind])
+        df = pd.DataFrame({
+            "id0": id[ind[0]],
+            "id1": id[ind[1]],
+            "val": mat[ind]
+        })
+        df.to_csv(out_file + '2', sep=' ', index=False, header=False, columns=["id0", "id1", "val"])
     else:
         return 0
     return 1
 
 
-def agmat(bed_file, inv=True, small_val=0.001, out_fmt='mat'):
+def agmat(bed_file, inv=False, small_val=0.001, out_fmt='mat'):
     """
     additive genomic relationship matrix and its inversion
     :param bed_file: The prefix for plink binary file
@@ -84,7 +94,7 @@ def agmat(bed_file, inv=True, small_val=0.001, out_fmt='mat'):
     return kin, kin_inv
 
 
-def dgmat_as(bed_file, inv=True, small_val=0.001, out_fmt='mat'):
+def dgmat_as(bed_file, inv=False, small_val=0.001, out_fmt='mat'):
     """
     dominance genomic relationship matrix and its inversion
     :param bed_file: The prefix for plink binary file

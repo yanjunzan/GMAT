@@ -1,7 +1,6 @@
 import logging
 import sys
 import numpy as np
-import pandas as pd
 from scipy.sparse import csr_matrix
 
 
@@ -15,21 +14,20 @@ def design_matrix_wemai_multi_gmat(pheno_file, bed_file):
     :return: phenotypic vectors, design matrixes of fixed effect, design matrixes of random effect (csr_matrix form)
     """
     id_bed_lst = []
-    fin = open(bed_file + '.fam')
-    for line in fin:
-        arr = line.split()
-        id_bed_lst.append(" ".join([arr[0], arr[1]]))
-    fin.close()
+    with open(bed_file + '.fam') as fin:
+        for line in fin:
+            arr = line.split()
+            id_bed_lst.append(" ".join([arr[0], arr[1]]))
     id_pheno_lst = {}
-    fin = open(pheno_file)
-    for line in fin:
-        arr = line.split()
-        try:
-            id_pheno_lst[" ".join([arr[0], arr[1]])].append(" ".join(arr))
-        except Exception as e:
-            del e
-            id_pheno_lst[" ".join([arr[0], arr[1]])] = [" ".join(arr)]
-    fin.close()
+    with open(pheno_file) as fin:
+        for line in fin:
+            arr = line.split()
+            if arr[-1] not in ['NA', 'NaN', 'nan', 'na']:
+                try:
+                    id_pheno_lst[" ".join([arr[0], arr[1]])].append(" ".join(arr))
+                except Exception as e:
+                    del e
+                    id_pheno_lst[" ".join([arr[0], arr[1]])] = [" ".join(arr)]
     id_not_pheno = set(id_bed_lst) - set(list(id_pheno_lst.keys()))
     if len(id_not_pheno) > 0:
         logging.error('The below genotyped id is not in the phenotype file:\n {}'.format('\n'.join(list(id_not_pheno))))
