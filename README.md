@@ -106,7 +106,7 @@ wemai_multi_gmat(pheno_file, bed_file, gmat_lst, out_file='var_a_axa.txt')
 
 # Step 3: Test
 var_com = np.loadtxt('var_a_axa.txt')  # numpy array： [0] addtive variance; [1] additive by additive variance; [2] residual variance
-remma_epiAA(pheno_file, bed_file, gmat_lst, var_com, p_cut=1.0e-4, out_file='epiAA_a_axa')
+remma_epiAA(pheno_file, bed_file, gmat_lst, var_com, p_cut=1.0e-5, out_file='epiAA_a_axa')
 
 # Step 4: Select top SNPs and add the SNP position
 res_file = 'epiAA_a_axa'  # result file
@@ -148,7 +148,7 @@ var_com = np.loadtxt('var_a_axa.txt')
 ag = np.loadtxt(bed_file + '.agrm0')
 gmat_lst = [ag, ag*ag]
 # parallel=[3, 1] means divide total tests into three parts and run part 1
-remma_epiAA_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 1], p_cut=0.0001, out_file='epiAA_parallel_a_axa')
+remma_epiAA_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 1], p_cut=1.0e-5, out_file='epiAA_parallel_a_axa')
 
 ## parallel 2
 import logging
@@ -161,7 +161,7 @@ var_com = np.loadtxt('var_a_axa.txt')
 ag = np.loadtxt(bed_file + '.agrm0')
 gmat_lst = [ag, ag*ag]
 # parallel=[3, 2] means divide total tests into three parts and run part 2
-remma_epiAA_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 2], p_cut=0.0001, out_file='epiAA_parallel_a_axa')
+remma_epiAA_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 2], p_cut=1.0e-5, out_file='epiAA_parallel_a_axa')
 
 ## parallel 3
 import logging
@@ -174,9 +174,10 @@ var_com = np.loadtxt('var_a_axa.txt')
 ag = np.loadtxt(bed_file + '.agrm0')
 gmat_lst = [ag, ag*ag]
 # parallel=[3, 3] means divide total tests into three parts and run part 3
-remma_epiAA_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 3], p_cut=0.0001, out_file='epiAA_parallel_a_axa')
+remma_epiAA_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 3], p_cut=1.0e-5, out_file='epiAA_parallel_a_axa')
 
 # Step 4: Merge files 'epiAA_parallel_a_axa.*' with the following codes.
+import os
 prefix = 'epiAA_parallel_a_axa'
 parallel_num = 3  # the number of parallels
 with open(prefix + ".merge", 'w') as fout:
@@ -188,6 +189,7 @@ with open(prefix + ".merge", 'w') as fout:
             head_line = fin.readline()
             for line in fin:
                 fout.write(line)
+        os.remove(prefix + '.' + str(i))
 
 # Step 5: Select top SNPs and add the SNP position
 from gmat.remma import annotation_snp_pos
@@ -223,7 +225,7 @@ wemai_multi_gmat(pheno_file, bed_file, gmat_lst, out_file='var_a_axa.txt')
 var_com = np.loadtxt('var_a_axa.txt')  # numpy array： [0] addtive variance; [1] additive by additive variance; [2] residual variance
 remma_epiAA_approx(pheno_file, bed_file, gmat_lst, var_com, p_cut=1.0e-5, num_random_pair=100000, out_file='epiAA_approx_a_axa')
 
-# Step 8: Select top SNPs and add the SNP position
+# Step 4: Select top SNPs and add the SNP position
 res_file = 'epiAA_approx_a_axa.exact_p'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
@@ -293,9 +295,10 @@ remma_epiAA_approx_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3
 
 # Step 4: Merge files 'epiAA_approx_parallel.exact_p.*' 
 # with the following codes.
-prefix = 'epiAA_approx_parallel.exact_p'
+import os
+prefix = 'epiAA_approx_parallel'
 parallel_num = 3  # the number of parallels
-with open(prefix + ".merge", 'w') as fout:
+with open(prefix + '.merge', 'w') as fout:
     with open(prefix + '.1') as fin:
         head_line = fin.readline()
         fout.write(head_line)
@@ -304,10 +307,11 @@ with open(prefix + ".merge", 'w') as fout:
             head_line = fin.readline()
             for line in fin:
                 fout.write(line)
+        os.remove(prefix + '.' + str(i))
 
 # Step 5: Select top SNPs and add the SNP position
 from gmat.remma import annotation_snp_pos                   
-res_file = 'epiAA_approx_parallel.exact_p.merge'  # result file
+res_file = 'epiAA_approx_parallel.merge'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
 

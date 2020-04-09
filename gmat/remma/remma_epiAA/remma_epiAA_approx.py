@@ -36,7 +36,20 @@ def remma_epiAA_approx(pheno_file, bed_file, gmat_lst, var_com, p_cut=1.0e-5, nu
                     out_file=out_file + '.approx_p')
     logging.info("\n\n#####Calculate exact p values for top SNP pairs#####")
     remma_epiAA_pair(pheno_file, bed_file, gmat_lst, var_com, snp_pair_file=out_file + '.approx_p', p_cut=1,
-                     out_file=out_file + '.exact_p')
+                     out_file=out_file + '.exact_p2')
+    logging.info("\n\n#####Merge the results#####")
+    p_dct = {}
+    with open(out_file + '.approx_p', 'r') as fin:
+        for line in fin:
+            arr = line.split()
+            p_dct[' '.join(arr[:2])] = arr[-1]
+    with open(out_file + '.exact_p2', 'r') as fin, open(out_file + '.exact_p', 'w') as fout:
+        for line in fin:
+            arr = line.split()
+            arr.insert(-1, p_dct[' '.join(arr[:2])])
+            fout.write(' '.join(arr) + '\n')
+    os.remove(out_file + '.approx_p')
+    os.remove(out_file + '.exact_p2')
     return 0
 
 
@@ -60,9 +73,9 @@ def remma_epiAA_approx_parallel(pheno_file, bed_file, gmat_lst, var_com, paralle
     bim_df = pd.read_csv(bed_file + '.bim', header=None)
     num_snp = bim_df.shape[0]
     random_pair(num_snp, out_file=out_file + '.random_pair.' + str(parallel[1]), num_pair=num_random_pair)
-    remma_epiAA_pair(pheno_file, bed_file, gmat_lst, var_com, snp_pair_file=out_file + '.random_pair', p_cut=1,
+    remma_epiAA_pair(pheno_file, bed_file, gmat_lst, var_com, snp_pair_file=out_file + '.random_pair.' + str(parallel[1]), p_cut=1,
                      out_file=out_file + '.random.' + str(parallel[1]))
-    res_df = pd.read_csv(out_file + '.random', header=0, sep='\s+')
+    res_df = pd.read_csv(out_file + '.random.' + str(parallel[1]), header=0, sep='\s+')
     var_median = np.median(res_df['var'])
     os.remove(out_file + '.random_pair.' + str(parallel[1]))
     os.remove(out_file + '.random.' + str(parallel[1]))
@@ -72,4 +85,17 @@ def remma_epiAA_approx_parallel(pheno_file, bed_file, gmat_lst, var_com, paralle
     logging.info("\n\n#####Calculate exact p values for top SNP pairs#####")
     remma_epiAA_pair(pheno_file, bed_file, gmat_lst, var_com, snp_pair_file=out_file + '.approx_p.' + str(parallel[1]), p_cut=1,
                      out_file=out_file + '.exact_p.' + str(parallel[1]))
+    logging.info("\n\n#####Merge the results#####")
+    p_dct = {}
+    with open(out_file + '.approx_p.' + str(parallel[1]), 'r') as fin:
+        for line in fin:
+            arr = line.split()
+            p_dct[' '.join(arr[:2])] = arr[-1]
+    with open(out_file + '.exact_p.' + str(parallel[1]), 'r') as fin, open(out_file + '.' + str(parallel[1]), 'w') as fout:
+        for line in fin:
+            arr = line.split()
+            arr.insert(-1, p_dct[' '.join(arr[:2])])
+            fout.write(' '.join(arr) + '\n')
+    os.remove(out_file + '.approx_p.' + str(parallel[1]))
+    os.remove(out_file + '.exact_p.' + str(parallel[1]))
     return 0
