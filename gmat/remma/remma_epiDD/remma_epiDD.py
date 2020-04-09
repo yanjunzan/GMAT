@@ -10,9 +10,10 @@ import sys
 from scipy.stats import chi2
 
 from gmat.process_plink.process_plink import read_plink, impute_geno
+from gmat.uvlmm.design_matrix import design_matrix_wemai_multi_gmat
 
 
-def remma_epiDD(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None, p_cut=0.0001, out_file='epiDD'):
+def _remma_epiDD(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None, p_cut=0.0001, out_file='epiDD'):
     """
     dominance by dominance epistasis test by random SNP-BLUP model.
     :param y: phenotypic vector
@@ -89,7 +90,27 @@ def remma_epiDD(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None, p_cu
     return 0
 
 
-def remma_epiDD_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel, p_cut=1.0e-4, out_file='epiDD_parallel'):
+def remma_epiDD(pheno_file, bed_file, gmat_lst, var_com, snp_lst_0=None, p_cut=1.0e-5, out_file='epiDD'):
+    """
+    Dominance by dominance epistasis test by random SNP-BLUP model.
+    :param pheno_file: phenotypic file. The fist two columns are family id, individual id which are same as plink *.fam
+    file. The third column is always ones for population mean. The last column is phenotypic values. The ohter covariate
+    can be added between columns for population mean and phenotypic values.
+    :param bed_file: the prefix for binary file
+    :param gmat_lst: a list of genomic relationship matrixes.
+    :param var_com: Estimated variances
+    :param snp_lst_0: the first SNP list for the SNP pairs. the min value is 0 and the max value is num_snp-2. The
+    default value is None, which means list [0, num_snp-1)
+    :param p_cut: put cut value. default value is 1.0e-5.
+    :param out_file: output file. default value is 'epiDD'.
+    :return: 0
+    """
+    y, xmat, zmat = design_matrix_wemai_multi_gmat(pheno_file, bed_file)
+    res = _remma_epiDD(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=snp_lst_0, p_cut=p_cut, out_file=out_file)
+    return res
+
+
+def _remma_epiDD_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel, p_cut=1.0e-4, out_file='epiDD_parallel'):
     """
     Parallel version. Dominance by dominance epistasis test by random SNP-BLUP model.
     :param y: phenotypic vector
@@ -118,6 +139,27 @@ def remma_epiDD_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel, p
     logging.info('SNP position point: ' +
                  ','.join(list(np.array([snp_pos_0, snp_pos_1, snp_pos_2, snp_pos_3], dtype=str))))
     snp_list_0 = list(range(snp_pos_0, snp_pos_1)) + list(range(snp_pos_2, snp_pos_3))
-    res = remma_epiDD(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=snp_list_0, p_cut=p_cut,
+    res = _remma_epiDD(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=snp_list_0, p_cut=p_cut,
                     out_file=out_file + '.' + str(parallel[1]))
+    return res
+
+
+def remma_epiDD_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel, p_cut=1.0e-5, out_file='epiDD_parallel'):
+    """
+    Parallel version. Dominance by dominance epistasis test by random SNP-BLUP model.
+    :param pheno_file: phenotypic file. The fist two columns are family id, individual id which are same as plink *.fam
+    file. The third column is always ones for population mean. The last column is phenotypic values. The ohter covariate
+    can be added between columns for population mean and phenotypic values.
+    :param bed_file: the prefix for binary file
+    :param gmat_lst: a list of genomic relationship matrixes.
+    :param var_com: Estimated variances
+    :param parallel: A list containing two integers. The first integer is the number of parts to parallel. The second
+    integer is the part to run. For example, parallel = [3, 1], parallel = [3, 2] and parallel = [3, 3] mean to divide
+    total number of tests into three parts and run parallelly.
+    :param p_cut: put cut value. default value is 1.0e-5.
+    :param out_file: output file. default value is 'epiDD_parallel'.
+    :return: 0
+    """
+    y, xmat, zmat = design_matrix_wemai_multi_gmat(pheno_file, bed_file)
+    res = _remma_epiDD_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel, p_cut=p_cut, out_file=out_file)
     return res

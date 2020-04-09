@@ -11,12 +11,13 @@ import os
 from scipy.stats import chi2
 
 from gmat.process_plink.process_plink import read_plink, impute_geno
+from gmat.uvlmm.design_matrix import design_matrix_wemai_multi_gmat
 
 
 from _cremma_epi_eff_cpu import ffi, lib
 
 
-def remma_epiDD_eff(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None, var_app=1.0, p_cut=1.0e-5, out_file='epiDD_eff'):
+def _remma_epiDD_eff(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None, var_app=1.0, p_cut=1.0e-5, out_file='epiDD_eff'):
     """
     Estimate dominance by dominance epistasis effects by random SNP-BLUP model.
     :param y: phenotypic vector
@@ -95,7 +96,29 @@ def remma_epiDD_eff(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None, 
     return 0
 
 
-def remma_epiDD_eff_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel,
+def remma_epiDD_eff(pheno_file, bed_file, gmat_lst, var_com, snp_lst_0=None, var_app=1.0, p_cut=1.0e-5, out_file='epiDD_eff'):
+    """
+    Estimate dominance by dominance epistasis effects by random SNP-BLUP model.
+    :param pheno_file: phenotypic file. The fist two columns are family id, individual id which are same as plink *.fam
+    file. The third column is always ones for population mean. The last column is phenotypic values. The ohter covariate
+    can be added between columns for population mean and phenotypic values.
+    :param bed_file: the prefix for binary file
+    :param gmat_lst: A list for relationship matrix
+    :param var_com: Estimated variances
+    :param snp_lst_0: the first SNP list for the SNP pairs. the min value is 0 and the max value is num_snp-2. The
+    default value is None, which means list [0, num_snp-1)
+    :param var_app: the approximate variances for estimated SNP effects.
+    :param p_cut: put cut value. default value is 1.0e-5.
+    :param out_file: output file. default value is 'epiDD_eff'.
+    :return: 0
+    """
+    y, xmat, zmat = design_matrix_wemai_multi_gmat(pheno_file, bed_file)
+    res = _remma_epiDD_eff(y, xmat, zmat, gmat_lst, var_com, bed_file,
+                           snp_lst_0=snp_lst_0, var_app=var_app, p_cut=p_cut, out_file=out_file)
+    return res
+
+
+def _remma_epiDD_eff_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel,
                                    var_app=1.0, p_cut=1.0e-5, out_file='epiDD_eff_parallel'):
     """
     Parallel version. Dominance by dominance epistasis test by random SNP-BLUP model.
@@ -126,6 +149,29 @@ def remma_epiDD_eff_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, paralle
     logging.info('SNP position point: ' +
                  ','.join(list(np.array([snp_pos_0, snp_pos_1, snp_pos_2, snp_pos_3], dtype=str))))
     snp_list_0 = list(range(snp_pos_0, snp_pos_1)) + list(range(snp_pos_2, snp_pos_3))
-    res = remma_epiDD_eff(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=snp_list_0, var_app=var_app,
+    res = _remma_epiDD_eff(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=snp_list_0, var_app=var_app,
                                 p_cut=p_cut, out_file=out_file + '.' + str(parallel[1]))
+    return res
+
+
+def remma_epiDD_eff_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel,
+                                   var_app=1.0, p_cut=1.0e-5, out_file='epiDD_eff_parallel'):
+    """
+    Parallel version. Dominance by dominance epistasis test by random SNP-BLUP model.
+    :param pheno_file: phenotypic file. The fist two columns are family id, individual id which are same as plink *.fam
+    file. The third column is always ones for population mean. The last column is phenotypic values. The ohter covariate
+    can be added between columns for population mean and phenotypic values.
+    :param bed_file: the prefix for binary file
+    :param gmat_lst: A list for relationship matrix
+    :param var_com: Estimated variances
+    :param parallel: A list containing two integers. The first integer is the number of parts to parallel. The second
+    integer is the part to run. For example, parallel = [3, 1], parallel = [3, 2] and parallel = [3, 3] mean to divide
+    :param var_app: the approximate variances for estimated SNP effects.
+    :param p_cut: put cut value. default value is 1.0e-5.
+    :param out_file: output file. default value is 'epiDD_eff_parallel'.
+    :return: 0
+    """
+    y, xmat, zmat = design_matrix_wemai_multi_gmat(pheno_file, bed_file)
+    res = _remma_epiDD_eff_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel,
+                                   var_app=var_app, p_cut=p_cut, out_file=out_file)
     return res

@@ -168,7 +168,7 @@ def remma_epiAA_eff_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel,
     integer is the part to run. For example, parallel = [3, 1], parallel = [3, 2] and parallel = [3, 3] mean to divide
     :param var_app: the approximate variances for estimated SNP effects.
     :param p_cut: put cut value. default value is 1.0e-5.
-    :param out_file: output file. default value is 'epiAA_eff'.
+    :param out_file: output file. default value is 'epiAA_eff_parallel'.
     :return: 0
     """
     y, xmat, zmat = design_matrix_wemai_multi_gmat(pheno_file, bed_file)

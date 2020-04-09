@@ -10,9 +10,10 @@ import sys
 from scipy.stats import chi2
 
 from gmat.process_plink.process_plink import read_plink, impute_geno
+from gmat.uvlmm.design_matrix import design_matrix_wemai_multi_gmat
 
 
-def remma_epiAD_pair(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_pair_file, max_test_pair=50000, p_cut=1.0e-4, out_file='epiAD_pair'):
+def _remma_epiAD_pair(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_pair_file, max_test_pair=50000, p_cut=1.0e-4, out_file='epiAD_pair'):
     """
     Given a SNP pair file, perform additive by dominance epistasis test by random SNP-BLUP model.
     :param y: phenotypic vector
@@ -94,3 +95,25 @@ def remma_epiAD_pair(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_pair_file, 
     cpu_t1 = time.process_time()
     logging.info("Running time: Clock time, {:.5f} sec; CPU time, {:.5f} sec.".format(clock_t1 - clock_t0, cpu_t1 - cpu_t0))
     return 0
+
+
+def remma_epiAD_pair(pheno_file, bed_file, gmat_lst, var_com, snp_pair_file, max_test_pair=50000, p_cut=1.0e-4, out_file='epiAD_pair'):
+    """
+    Given a SNP pair file, perform additive by additive epistasis test by random SNP-BLUP model.
+    :param pheno_file: phenotypic file. The fist two columns are family id, individual id which are same as plink *.fam
+    file. The third column is always ones for population mean. The last column is phenotypic values. The ohter covariate
+    can be added between columns for population mean and phenotypic values.
+    :param bed_file: the prefix for binary file
+    :param gmat_lst: A list for relationship matrix
+    :param var_com: Estimated variances
+    :param snp_pair_file: a file containing index for SNP pairs. The program only reads the first two columns and test
+    SNP pairs row by row. The max value is num_snp - 1, and the min value is 0.
+    :param max_test_pair: The max number of SNP pairs stored in memory. Default value is 50000.
+    :param p_cut: put cut value. default value is 0.0001.
+    :param out_file: output file. default value is 'epiAD_pair'.
+    :return: 0
+    """
+    y, xmat, zmat = design_matrix_wemai_multi_gmat(pheno_file, bed_file)
+    res = _remma_epiAD_pair(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_pair_file,
+                            max_test_pair=max_test_pair, p_cut=p_cut, out_file=out_file)
+    return res
