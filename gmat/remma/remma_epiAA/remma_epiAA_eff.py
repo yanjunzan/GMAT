@@ -175,4 +175,3 @@ def remma_epiAA_eff_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel,
     res = _remma_epiAA_eff_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel,
                                    var_app=var_app, p_cut=p_cut, out_file=out_file)
     return res
-

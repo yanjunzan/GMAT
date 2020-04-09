@@ -226,7 +226,7 @@ var_com = np.loadtxt('var_a_axa.txt')  # numpy array： [0] addtive variance; [1
 remma_epiAA_approx(pheno_file, bed_file, gmat_lst, var_com, p_cut=1.0e-5, num_random_pair=100000, out_file='epiAA_approx_a_axa')
 
 # Step 4: Select top SNPs and add the SNP position
-res_file = 'epiAA_approx_a_axa.exact_p'  # result file
+res_file = 'epiAA_approx_a_axa'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
 
@@ -265,7 +265,7 @@ var_com = np.loadtxt('var_a_axa.txt')
 ag = np.loadtxt(bed_file + '.agrm0')
 gmat_lst = [ag, ag*ag]
 # parallel=[3, 1] means divide total tests into three parts and run part 1
-remma_epiAA_approx_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 1], p_cut=1.0e-5, out_file='epiAA_approx_parallel')
+remma_epiAA_approx_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 1], p_cut=1.0e-5, out_file='epiAA_approx_parallel_a_axa')
 
 ## parallel 2
 import logging
@@ -277,8 +277,8 @@ pheno_file = 'pheno'
 var_com = np.loadtxt('var_a_axa.txt')
 ag = np.loadtxt(bed_file + '.agrm0')
 gmat_lst = [ag, ag*ag]
-# parallel=[3, 2] means divide total tests into three parts and run part 1
-remma_epiAA_approx_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 2], p_cut=1.0e-5, out_file='epiAA_approx_parallel')
+# parallel=[3, 2] means divide total tests into three parts and run part 2
+remma_epiAA_approx_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 2], p_cut=1.0e-5, out_file='epiAA_approx_parallel_a_axa')
 
 ## parallel 3
 import logging
@@ -290,13 +290,13 @@ pheno_file = 'pheno'
 var_com = np.loadtxt('var_a_axa.txt')
 ag = np.loadtxt(bed_file + '.agrm0')
 gmat_lst = [ag, ag*ag]
-# parallel=[3, 3] means divide total tests into three parts and run part 1
-remma_epiAA_approx_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 3], p_cut=1.0e-5, out_file='epiAA_approx_parallel')
+# parallel=[3, 3] means divide total tests into three parts and run part 3
+remma_epiAA_approx_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 3], p_cut=1.0e-5, out_file='epiAA_approx_parallel_a_axa')
 
-# Step 4: Merge files 'epiAA_approx_parallel.exact_p.*' 
+# Step 4: Merge files 'epiAA_approx_parallel_a_axa.*' 
 # with the following codes.
 import os
-prefix = 'epiAA_approx_parallel'
+prefix = 'epiAA_approx_parallel_a_axa'
 parallel_num = 3  # the number of parallels
 with open(prefix + '.merge', 'w') as fout:
     with open(prefix + '.1') as fin:
@@ -311,7 +311,7 @@ with open(prefix + '.merge', 'w') as fout:
 
 # Step 5: Select top SNPs and add the SNP position
 from gmat.remma import annotation_snp_pos                   
-res_file = 'epiAA_approx_parallel.merge'  # result file
+res_file = 'epiAA_approx_parallel_a_axa.merge'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
 

@@ -36,20 +36,20 @@ def remma_epiAA_approx(pheno_file, bed_file, gmat_lst, var_com, p_cut=1.0e-5, nu
                     out_file=out_file + '.approx_p')
     logging.info("\n\n#####Calculate exact p values for top SNP pairs#####")
     remma_epiAA_pair(pheno_file, bed_file, gmat_lst, var_com, snp_pair_file=out_file + '.approx_p', p_cut=1,
-                     out_file=out_file + '.exact_p2')
+                     out_file=out_file + '.exact_p')
     logging.info("\n\n#####Merge the results#####")
     p_dct = {}
     with open(out_file + '.approx_p', 'r') as fin:
         for line in fin:
             arr = line.split()
             p_dct[' '.join(arr[:2])] = arr[-1]
-    with open(out_file + '.exact_p2', 'r') as fin, open(out_file + '.exact_p', 'w') as fout:
+    with open(out_file + '.exact_p', 'r') as fin, open(out_file, 'w') as fout:
         for line in fin:
             arr = line.split()
             arr.insert(-1, p_dct[' '.join(arr[:2])])
             fout.write(' '.join(arr) + '\n')
     os.remove(out_file + '.approx_p')
-    os.remove(out_file + '.exact_p2')
+    os.remove(out_file + '.exact_p')
     return 0
 
 
