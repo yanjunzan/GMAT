@@ -14,6 +14,8 @@
   * [3.3 Exhaustive additive by dominance epistatis](#33-Exhaustive-additive-by-dominance-epistatis)
   * [3.4 Exhaustive dominance by dominance epistatis](#34-Exhaustive-dominance-by-dominance-epistatis)
   * [3.5 Exhaustive additive by additive epistatis with repeated measures](#35-Exhaustive-additive-by-additive-epistatis-with-repeated-measures)
+  * [3.6 Additive test](#36-Additive-test)
+  * [3.7 Dominance test](#37-Dominance-test)
 
 # 1 Contact
 Chao Ning  
@@ -1720,6 +1722,127 @@ res_file = 'epiAA_approx_parallel.merge'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=0.05*2/(28220*28219), dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 
 ```
+
+</code></pre>
+</details>
+
+
+## 3.6 Additive test
+#### No repeated measures
+Data: Mouse data in directory of GMAT/examples/data/mouse
+
+<details>
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
+  <pre><code> 
+
+```python
+import logging
+logging.basicConfig(level=logging.INFO)
+import numpy as np
+from gmat.gmatrix import agmat, dgmat_as
+from gmat.uvlmm.uvlmm_varcom import wemai_multi_gmat
+from gmat.remma import remma_add
+
+# Step 1: Calculate the genomic relationship matrix
+bed_file = 'plink'  # the prefix for the plink binary file
+agmat(bed_file)  # additive genomic relationship matrix
+dgmat_as(bed_file)  # dominance genomic relationship matrix
+
+# Step 2: Estimate the variances
+pheno_file = 'pheno'  # phenotypic file
+ag = np.loadtxt(bed_file + '.agrm0')  # load the additive genomic relationship matrix
+dg = np.loadtxt(bed_file + '.dgrm_as0')  # load the dominance genomic relationship matrix
+gmat_lst = [ag, dg, ag*ag, ag*dg, dg*dg]  # The first one must be addtive genomic relationship matrix. The others can be removed from the list.
+                                          # ag*ag: additive by additive; ag*dg: additive by dominance; dg*dg: dominance by dominance
+# gmat_lst = [ag]
+# gmat_lst = [ag, dg]
+# gmat_lst = [ag, dg, ag*ag]
+wemai_multi_gmat(pheno_file, bed_file, gmat_lst, out_file='var_add.txt')
+
+# Step 3: Test
+var_com = np.loadtxt('var_add.txt') # numpy array
+res = remma_add(pheno_file, bed_file, gmat_lst, var_com, out_file='remma_add')
+```
+
+</code></pre>
+</details>
+
+#### With  repeated measures
+Data: Yeast data in directory of GMAT/examples/data/yeast
+No heterozygous genotypes. No dominance effects.
+
+<details>
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
+  <pre><code> 
+
+```python
+import logging
+logging.basicConfig(level=logging.INFO)
+import numpy as np
+from gmat.gmatrix import agmat
+from gmat.uvlmm.uvlmm_varcom import wemai_multi_gmat
+from gmat.remma.remma_add import remma_add
+
+# Step 1: Calculate the genomic relationship matrix
+bed_file = 'CobaltChloride'  # the prefix for the plink binary file
+agmat(bed_file) 
+
+# Step 2: Estimate the variances
+pheno_file = 'CobaltChloride'  # phenotypic file
+ag = np.loadtxt(bed_file + '.agrm0')  # load the additive genomic relationship matrix
+pe = np.eye(ag.shape[0])  # identity matrix with dimension equal to the number of individuals. 
+                          # to model the individual-specific error (permanent environmental effect)
+gmat_lst = [ag, ag*ag, pe]  # ag*ag is the additive by additive genomic relationship matrix
+wemai_multi_gmat(pheno_file, bed_file, gmat_lst, out_file='var_add.txt')
+
+# Step 3: Test
+var_com = np.loadtxt('var_add.txt')  # numpy array： [0] addtive variance; [1] additive by additive variance; 
+                                             # [2] individual-specific error variance [3] residual variance
+res = remma_add(pheno_file, bed_file, gmat_lst, var_com, out_file='remma_add')
+```
+
+</code></pre>
+</details>
+
+## 3.7 Dominance test
+Data: Mouse data in directory of GMAT/examples/data/mouse
+
+<details>
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
+  <pre><code> 
+
+
+```python
+import logging
+logging.basicConfig(level=logging.INFO)
+import numpy as np
+from gmat.gmatrix import agmat, dgmat_as
+from gmat.uvlmm.uvlmm_varcom import wemai_multi_gmat
+from gmat.remma import remma_dom
+
+# Step 1: Calculate the genomic relationship matrix
+bed_file = 'plink'  # the prefix for the plink binary file
+agmat(bed_file)  # additive genomic relationship matrix
+dgmat_as(bed_file)  # dominance genomic relationship matrix
+
+# Step 2: Estimate the variances
+pheno_file = 'pheno'  # phenotypic file
+ag = np.loadtxt(bed_file + '.agrm0')  # load the additive genomic relationship matrix
+dg = np.loadtxt(bed_file + '.dgrm_as0')  # load the dominance genomic relationship matrix
+gmat_lst = [ag, dg, ag*ag, ag*dg, dg*dg]  # The first one must be addtive genomic relationship matrix. 
+                                          # The second one must be dominance genomic relationship matrix. 
+                                          # The others can be removed from the list.
+                                          # ag*ag: additive by additive; ag*dg: additive by dominance; dg*dg: dominance by dominance
+# gmat_lst = [ag, dg]
+# gmat_lst = [ag, dg, ag*ag]
+# gmat_lst = [ag, dg, ag*ag, ag*dg, dg*dg, np.eye(ag.shape[0])]  # Not fit this data, but can be used for the other data with repeated mesures.
+wemai_multi_gmat(pheno_file, bed_file, gmat_lst, out_file='var_dom.txt')
+
+# Step 3: Test
+var_com = np.loadtxt('var_dom.txt') # numpy array
+res = remma_dom(pheno_file, bed_file, gmat_lst, var_com, out_file='remma_dom')
+```
+
 
 </code></pre>
 </details>
