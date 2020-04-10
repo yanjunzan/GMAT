@@ -84,6 +84,7 @@ Data: Mouse data in directory of GMAT/examples/data/mouse
 
 ### 3.2.1 Include additive and additive by additive genomic relationship matrix
 #### (1)  Exact test (for small data)
+
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
@@ -115,10 +116,13 @@ remma_epiAA(pheno_file, bed_file, gmat_lst, var_com, p_cut=1.0e-5, out_file='epi
 res_file = 'epiAA_a_axa'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
+
 </code></pre>
 </details>
+
 #### (2) Parallel exact test  (for small data)
 Analysis can be subdivided with remma_epiAA_parallel and run parallelly on different machines.
+
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
@@ -203,10 +207,12 @@ res_file = 'epiAA_parallel_a_axa.merge'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 
 ```
+
 </code></pre>
 </details>
 
 #### (3) approximate test (recommended for big data)
+
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
@@ -239,11 +245,13 @@ remma_epiAA_approx(pheno_file, bed_file, gmat_lst, var_com, p_cut=1.0e-5, num_ra
 res_file = 'epiAA_approx_a_axa'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
+
 </code></pre>
 </details>
 
 #### (4) Parallel approximate test (recommended for big data)
 Analysis can be subdivided with remma_epiAA_approx_parallel and run parallelly on different machines.
+
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
@@ -333,6 +341,7 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 
 ### 3.2.2 Include additive, dominance and additive by additive genomic relationship matrix
 #### (1) Exact test (for small data)
+
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
@@ -368,8 +377,10 @@ res_file = 'epiAA_a_d_axa'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 
 ```
+
 </code></pre>
 </details>
+
 #### (2) Parallel exact test (for small data)
 Analysis can be subdivided with remma_epiAA_parallel and run parallelly on different machines.
 
@@ -463,7 +474,9 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 ```
 </code></pre>
 </details>
+
 #### (3) approximate test (recommended for big data)
+
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
@@ -499,10 +512,13 @@ remma_epiAA_approx(pheno_file, bed_file, gmat_lst, var_com, p_cut=1.0e-5, num_ra
 res_file = 'epiAA_approx_a_d_axa'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
+
 </code></pre>
 </details>
+
 #### (4) Parallel approximate test (recommended for big data)
 Analysis can be subdivided with remma_epiAA_approx_parallel and run parallelly on different machines.
+
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
@@ -593,11 +609,14 @@ from gmat.remma import annotation_snp_pos
 res_file = 'epiAA_approx_parallel_a_d_axa.merge'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
+
 </code></pre>
 </details>
+
 ### 3.2.3 Include additive, dominance and three kinds of epistatic genomic relationship matrix
 additive, dominance, additive by additive, additive by dominance and dominance by dominance genomic relationship matrix   
 #### (1) Exact test (for small data)
+
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
@@ -633,11 +652,13 @@ remma_epiAA(pheno_file, bed_file, gmat_lst, var_com, p_cut=1.0e-5, out_file='epi
 res_file = 'epiAA'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
+
 </code></pre>
 </details>
 
 #### (2) Parallel exact test (for small data)
 Analysis can be subdivided with remma_epiAA_parallel and run parallelly on different machines.
+
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
@@ -727,10 +748,12 @@ from gmat.remma import annotation_snp_pos
 res_file = 'epiAA_parallel.merge'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
+
 </code></pre>
 </details>
 
 #### (3) approximate test (recommended for big data)
+
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
@@ -767,11 +790,13 @@ res_file = 'epiAA_approx'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 
 ```
+
 </code></pre>
 </details>
 
 #### (4) Parallel approximate test (recommended for big data)
 Analysis can be subdivided with remma_epiAA_approx_parallel and run parallelly on different machines.
+
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
@@ -862,6 +887,7 @@ from gmat.remma import annotation_snp_pos
 res_file = 'epiAA_approx_parallel.merge'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
+
 </code></pre>
 </details>
 
@@ -869,6 +895,7 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 Data: Mouse data in directory of GMAT/examples/data/mouse  
 Include additive, dominance, additive by additive, additive by dominance and dominance by dominance genomic relationship matrix  
 #### (1) Exact test (for small data)
+
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
@@ -905,10 +932,13 @@ res_file = 'epiAD'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 
 ```
+
 </code></pre>
 </details>
+
 #### (2) Parallel exact test (for small data)
 Analysis can be subdivided with remma_epiAD_parallel and run parallelly on different machines.
+
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
@@ -998,10 +1028,12 @@ from gmat.remma import annotation_snp_pos
 res_file = 'epiAD_parallel.merge'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
+
 </code></pre>
 </details>
 
 #### (3) approximate test (recommended for big data)
+
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
@@ -1037,10 +1069,13 @@ remma_epiAD_approx(pheno_file, bed_file, gmat_lst, var_com, p_cut=1.0e-5, num_ra
 res_file = 'epiAD_approx'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
+
 </code></pre>
 </details>
+
 #### (4) Parallel approximate test (recommended for big data)
 Analysis can be subdivided with remma_epiAD_approx_parallel and run parallelly on different machines.
+
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
@@ -1131,6 +1166,7 @@ from gmat.remma import annotation_snp_pos
 res_file = 'epiAD_approx_parallel.merge'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
+
 </code></pre>
 </details>
 
@@ -1173,8 +1209,10 @@ remma_epiDD(pheno_file, bed_file, gmat_lst, var_com, p_cut=1.0e-5, out_file='epi
 res_file = 'epiDD'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
+
 </code></pre>
 </details>
+
 #### (2) Parallel exact test (for small data)
 Analysis can be subdivided with remma_epiDD_parallel and run parallelly on different machines.
 
@@ -1267,6 +1305,7 @@ from gmat.remma import annotation_snp_pos
 res_file = 'epiDD_parallel.merge'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
+
 </code></pre>
 </details>
 
@@ -1306,10 +1345,13 @@ remma_epiDD_approx(pheno_file, bed_file, gmat_lst, var_com, p_cut=1.0e-5, num_ra
 res_file = 'epiDD_approx'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
+
 </code></pre>
 </details>
+
 #### (4) Parallel approximate test (recommended for big data)
 Analysis can be subdivided with remma_epiDD_approx_parallel and run parallelly on different machines.
+
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>
@@ -1407,6 +1449,7 @@ Data: Yeast data in directory of GMAT/examples/data/yeast
 No heterozygous genotypes. No dominance effects.   
   
 #### (1) Exact test (for small data)
+
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
@@ -1442,10 +1485,13 @@ remma_epiAA(pheno_file, bed_file, gmat_lst, var_com, p_cut=1.0e-5, out_file='epi
 res_file = 'epiAA'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
+
 </code></pre>
 </details>
+
 #### (2) Parallel exact test (for small data)
 Analysis can be subdivided with remma_epiAA_parallel and run parallelly on different machines.
+
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code> 
@@ -1535,10 +1581,12 @@ from gmat.remma import annotation_snp_pos
 res_file = 'epiAA_parallel.merge'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
+
 </code></pre>
 </details>
 
 #### (3) approximate test (recommended for big data)
+
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
@@ -1575,9 +1623,12 @@ remma_epiAA_approx(pheno_file, bed_file, gmat_lst, var_com, p_cut=1.0e-5, num_ra
 res_file = 'epiAA_approx'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=0.05*2/(28220*28219), dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 ```
+
 </code></pre>
 </details>
+
 #### (4) Parallel approximate test (recommended for big data)
+
 Analysis can be subdivided with remma_epiAA_approx_parallel and run parallelly on different machines.
 <details>
   <summary><mark><font color=red>Click to view codes</font></mark></summary
@@ -1669,5 +1720,6 @@ res_file = 'epiAA_approx_parallel.merge'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=0.05*2/(28220*28219), dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
 
 ```
+
 </code></pre>
 </details>
