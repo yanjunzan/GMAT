@@ -13,6 +13,7 @@
     * [3.2.3 Include additive, dominance and three kinds of epistatic genomic relationship matrix](#323-Include-additive-dominance-and-three-kinds-of-epistatic-genomic-relationship-matrix)
   * [3.3 Exhaustive additive by dominance epistatis](#33-Exhaustive-additive-by-dominance-epistatis)
   * [3.4 Exhaustive dominance by dominance epistatis](#34-Exhaustive-dominance-by-dominance-epistatis)
+  * [3.5 Exhaustive additive by additive epistatis with repeated measures](#35-Exhaustive-additive-by-additive-epistatis-with-repeated-measures)
 
 # 1 Contact
 Chao Ning  
@@ -84,9 +85,9 @@ Data: Mouse data in directory of GMAT/examples/data/mouse
 ### 3.2.1 Include additive and additive by additive genomic relationship matrix
 #### (1)  Exact test (for small data)
 <details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
-  
+ 
 ```python
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -116,12 +117,10 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 ```
 </code></pre>
 </details>
-
 #### (2) Parallel exact test  (for small data)
 Analysis can be subdivided with remma_epiAA_parallel and run parallelly on different machines.
-
 <details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
 
 ```python
@@ -209,9 +208,8 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 
 #### (3) approximate test (recommended for big data)
 <details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
-
 
 ```python
 import logging
@@ -247,9 +245,8 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 #### (4) Parallel approximate test (recommended for big data)
 Analysis can be subdivided with remma_epiAA_approx_parallel and run parallelly on different machines.
 <details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
-
 
 ```python
 import logging
@@ -337,7 +334,7 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 ### 3.2.2 Include additive, dominance and additive by additive genomic relationship matrix
 #### (1) Exact test (for small data)
 <details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
 
 
@@ -373,13 +370,12 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 ```
 </code></pre>
 </details>
-
 #### (2) Parallel exact test (for small data)
 Analysis can be subdivided with remma_epiAA_parallel and run parallelly on different machines.
-<details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
-  <pre><code>  
 
+<details>
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
+  <pre><code>  
 
 ```python
 import logging
@@ -467,12 +463,11 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 ```
 </code></pre>
 </details>
-
 #### (3) approximate test (recommended for big data)
-
 <details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
+
 
 ```python
 import logging
@@ -506,11 +501,10 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 ```
 </code></pre>
 </details>
-
 #### (4) Parallel approximate test (recommended for big data)
 Analysis can be subdivided with remma_epiAA_approx_parallel and run parallelly on different machines.
 <details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
 
 
@@ -601,12 +595,11 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 ```
 </code></pre>
 </details>
-
 ### 3.2.3 Include additive, dominance and three kinds of epistatic genomic relationship matrix
 additive, dominance, additive by additive, additive by dominance and dominance by dominance genomic relationship matrix   
 #### (1) Exact test (for small data)
 <details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
 
 
@@ -646,7 +639,7 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 #### (2) Parallel exact test (for small data)
 Analysis can be subdivided with remma_epiAA_parallel and run parallelly on different machines.
 <details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
 
 
@@ -738,11 +731,9 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 </details>
 
 #### (3) approximate test (recommended for big data)
-
 <details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
-
 
 
 ```python
@@ -782,7 +773,7 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 #### (4) Parallel approximate test (recommended for big data)
 Analysis can be subdivided with remma_epiAA_approx_parallel and run parallelly on different machines.
 <details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
 
 
@@ -875,12 +866,13 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 </details>
 
 ## 3.3 Exhaustive additive by dominance epistatis  
+Data: Mouse data in directory of GMAT/examples/data/mouse  
 Include additive, dominance, additive by additive, additive by dominance and dominance by dominance genomic relationship matrix  
 #### (1) Exact test (for small data)
-
 <details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
+
 
 ```python
 import logging
@@ -915,11 +907,10 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 ```
 </code></pre>
 </details>
-
 #### (2) Parallel exact test (for small data)
 Analysis can be subdivided with remma_epiAD_parallel and run parallelly on different machines.
 <details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
 
 
@@ -1012,7 +1003,7 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 
 #### (3) approximate test (recommended for big data)
 <details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
 
 
@@ -1048,11 +1039,10 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 ```
 </code></pre>
 </details>
-
 #### (4) Parallel approximate test (recommended for big data)
 Analysis can be subdivided with remma_epiAD_approx_parallel and run parallelly on different machines.
 <details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
 
 
@@ -1145,11 +1135,12 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 </details>
 
 ## 3.4 Exhaustive dominance by dominance epistatis  
-Include additive, dominance, additive by additive, additive by dominance and dominance by dominance genomic relationship matrix  
+Data: Mouse data in directory of GMAT/examples/data/mouse  
+Include additive, dominance, additive by additive, additive by dominance and dominance by dominance genomic relationship matrix   
 #### (1) Exact test (for small data)
 
 <details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
 
 ```python
@@ -1184,11 +1175,11 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 ```
 </code></pre>
 </details>
-
 #### (2) Parallel exact test (for small data)
 Analysis can be subdivided with remma_epiDD_parallel and run parallelly on different machines.
+
 <details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
 
 
@@ -1282,7 +1273,7 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 #### (3) approximate test (recommended for big data)
 
 <details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
   <pre><code>  
 
 ```python
@@ -1317,13 +1308,11 @@ annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5
 ```
 </code></pre>
 </details>
-
 #### (4) Parallel approximate test (recommended for big data)
 Analysis can be subdivided with remma_epiDD_approx_parallel and run parallelly on different machines.
-
 <details>
-  <summary><mark><font color=darkred>Click to view codes</font></mark></summary
-  <pre><code>  
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
+  <pre><code>
 
 ```python
 import logging
@@ -1409,6 +1398,276 @@ with open(prefix + '.merge', 'w') as fout:
 from gmat.remma import annotation_snp_pos                   
 res_file = 'epiDD_approx_parallel.merge'  # result file
 annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
+```
+</code></pre>
+</details>
+
+## 3.5 Exhaustive additive by additive epistatis with repeated measures
+Data: Yeast data in directory of GMAT/examples/data/yeast   
+No heterozygous genotypes. No dominance effects.   
+  
+#### (1) Exact test (for small data)
+<details>
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
+  <pre><code>  
+
+
+```python
+import logging
+logging.basicConfig(level=logging.INFO)
+import numpy as np
+from gmat.gmatrix import agmat
+from gmat.uvlmm.uvlmm_varcom import wemai_multi_gmat
+from gmat.remma.remma_epiAA import remma_epiAA
+from gmat.remma import annotation_snp_pos
+
+# Step 1: Calculate the genomic relationship matrix
+bed_file = 'CobaltChloride'  # the prefix for the plink binary file
+agmat(bed_file) 
+
+# Step 2: Estimate the variances
+pheno_file = 'CobaltChloride'  # phenotypic file
+ag = np.loadtxt(bed_file + '.agrm0')  # load the additive genomic relationship matrix
+pe = np.eye(ag.shape[0])  # identity matrix with dimension equal to the number of individuals. 
+                          # to model the individual-specific error (permanent environmental effect)
+gmat_lst = [ag, ag*ag, pe]  # ag*ag is the additive by additive genomic relationship matrix
+wemai_multi_gmat(pheno_file, bed_file, gmat_lst, out_file='var.txt')
+
+# Step 3: Test
+var_com = np.loadtxt('var.txt')  # numpy array： [0] addtive variance; [1] additive by additive variance; 
+                                             # [2] individual-specific error variance [3] residual variance
+remma_epiAA(pheno_file, bed_file, gmat_lst, var_com, p_cut=1.0e-5, out_file='epiAA')
+
+# Step 4: Select top SNPs and add the SNP position
+res_file = 'epiAA'  # result file
+annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
+```
+</code></pre>
+</details>
+#### (2) Parallel exact test (for small data)
+Analysis can be subdivided with remma_epiAA_parallel and run parallelly on different machines.
+<details>
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
+  <pre><code> 
+
+```python
+import logging
+logging.basicConfig(level=logging.INFO)
+import numpy as np
+from gmat.gmatrix import agmat
+from gmat.uvlmm.design_matrix import design_matrix_wemai_multi_gmat
+from gmat.uvlmm.uvlmm_varcom import wemai_multi_gmat
+
+# Step 1: Calculate the genomic relationship matrix
+bed_file = 'CobaltChloride'  # the prefix for the plink binary file
+agmat(bed_file) 
+
+# Step 2: Estimate the variances
+pheno_file = 'CobaltChloride'  # phenotypic file
+ag = np.loadtxt(bed_file + '.agrm0')  # load the additive genomic relationship matrix
+pe = np.eye(ag.shape[0])  # identity matrix with dimension equal to the number of individuals. 
+                          # to model the individual-specific error (permanent environmental effect)
+gmat_lst = [ag, ag*ag, pe]  # ag*ag is the additive by additive genomic relationship matrix
+wemai_multi_gmat(pheno_file, bed_file, gmat_lst, out_file='var.txt')
+
+
+# Step 3: parallel test. Write codes of thist step in separate scripts and run parallelly
+
+## parallel 1
+import logging
+logging.basicConfig(level=logging.INFO)
+import numpy as np
+from gmat.remma.remma_epiAA import remma_epiAA_parallel
+bed_file = 'CobaltChloride'
+pheno_file = 'CobaltChloride'
+var_com = np.loadtxt('var.txt')
+ag = np.loadtxt(bed_file + '.agrm0')
+pe = np.eye(ag.shape[0]) 
+gmat_lst = [ag, ag*ag, pe]
+# parallel=[3, 1] means divide total tests into three parts and run part 1
+remma_epiAA_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 1], p_cut=1.0e-5, out_file='epiAA_parallel')
+
+## parallel 2
+import logging
+logging.basicConfig(level=logging.INFO)
+import numpy as np
+from gmat.remma.remma_epiAA import remma_epiAA_parallel
+bed_file = 'CobaltChloride'
+pheno_file = 'CobaltChloride'
+var_com = np.loadtxt('var.txt')
+ag = np.loadtxt(bed_file + '.agrm0')
+pe = np.eye(ag.shape[0]) 
+gmat_lst = [ag, ag*ag, pe]
+# parallel=[3, 2] means divide total tests into three parts and run part 2
+remma_epiAA_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 2], p_cut=1.0e-5, out_file='epiAA_parallel')
+
+## parallel 3
+import logging
+logging.basicConfig(level=logging.INFO)
+import numpy as np
+from gmat.remma.remma_epiAA import remma_epiAA_parallel
+bed_file = 'CobaltChloride'
+pheno_file = 'CobaltChloride'
+var_com = np.loadtxt('var.txt')
+ag = np.loadtxt(bed_file + '.agrm0')
+pe = np.eye(ag.shape[0]) 
+gmat_lst = [ag, ag*ag, pe]
+# parallel=[3, 3] means divide total tests into three parts and run part 3
+remma_epiAA_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 3], p_cut=1.0e-5, out_file='epiAA_parallel')
+
+# Step 4: Merge files 'epiAA_parallel.*' with the following codes.
+import os
+prefix = 'epiAA_parallel'
+parallel_num = 3  # the number of parallels
+with open(prefix + ".merge", 'w') as fout:
+    with open(prefix + '.1') as fin:
+        head_line = fin.readline()
+        fout.write(head_line)
+    for i in range(1, parallel_num+1):
+        with open(prefix + '.' + str(i)) as fin:
+            head_line = fin.readline()
+            for line in fin:
+                fout.write(line)
+        os.remove(prefix + '.' + str(i))
+
+# Step 5: Select top SNPs and add the SNP position
+from gmat.remma import annotation_snp_pos
+res_file = 'epiAA_parallel.merge'  # result file
+annotation_snp_pos(res_file, bed_file, p_cut=1.0e-5, dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
+```
+</code></pre>
+</details>
+
+#### (3) approximate test (recommended for big data)
+<details>
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
+  <pre><code>  
+
+
+```python
+import logging
+logging.basicConfig(level=logging.INFO)
+import numpy as np
+import pandas as pd
+from gmat.gmatrix import agmat
+from gmat.uvlmm.uvlmm_varcom import wemai_multi_gmat
+from gmat.remma.remma_epiAA import remma_epiAA_approx
+from gmat.remma import annotation_snp_pos
+
+# Step 1: Calculate the genomic relationship matrix
+bed_file = 'CobaltChloride'  # the prefix for the plink binary file
+agmat(bed_file) 
+
+# Step 2: Estimate the variances
+pheno_file = 'CobaltChloride'  # phenotypic file
+ag = np.loadtxt(bed_file + '.agrm0')  # load the additive genomic relationship matrix
+pe = np.eye(ag.shape[0])  # identity matrix with dimension equal to the number of individuals. 
+                          # to model the individual-specific error (permanent environmental effect)
+gmat_lst = [ag, ag*ag, pe]  # ag*ag is the additive by additive genomic relationship matrix
+wemai_multi_gmat(pheno_file, bed_file, gmat_lst, out_file='var.txt')
+
+# Step 3: Approximate test
+var_com = np.loadtxt('var.txt')  # numpy array： [0] addtive variance; [1] additive by additive variance; 
+                                             # [2] individual-specific error variance [3] residual variance
+remma_epiAA_approx(pheno_file, bed_file, gmat_lst, var_com, p_cut=1.0e-5, num_random_pair=100000, out_file='epiAA_approx')
+
+# Step 4: Select top SNPs and add the SNP position
+res_file = 'epiAA_approx'  # result file
+annotation_snp_pos(res_file, bed_file, p_cut=0.05*2/(28220*28219), dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
+```
+</code></pre>
+</details>
+#### (4) Parallel approximate test (recommended for big data)
+Analysis can be subdivided with remma_epiAA_approx_parallel and run parallelly on different machines.
+<details>
+  <summary><mark><font color=red>Click to view codes</font></mark></summary
+  <pre><code> 
+
+```python
+import logging
+logging.basicConfig(level=logging.INFO)
+import numpy as np
+import pandas as pd
+from gmat.gmatrix import agmat
+from gmat.uvlmm.uvlmm_varcom import wemai_multi_gmat
+
+# Step 1: Calculate the genomic relationship matrix
+bed_file = 'CobaltChloride'  # the prefix for the plink binary file
+agmat(bed_file) 
+
+# Step 2: Estimate the variances
+pheno_file = 'CobaltChloride'  # phenotypic file
+ag = np.loadtxt(bed_file + '.agrm0')  # load the additive genomic relationship matrix
+pe = np.eye(ag.shape[0])  # identity matrix with dimension equal to the number of individuals. 
+                          # to model the individual-specific error (permanent environmental effect)
+gmat_lst = [ag, ag*ag, pe]  # ag*ag is the additive by additive genomic relationship matrix
+wemai_multi_gmat(pheno_file, bed_file, gmat_lst, out_file='var.txt')
+
+# Step 3: parallel approximate test. Write codes of thist step in separate scripts and run parallelly
+
+## parallel 1
+import logging
+logging.basicConfig(level=logging.INFO)
+import numpy as np
+from gmat.remma.remma_epiAA import remma_epiAA_approx_parallel
+bed_file = 'CobaltChloride'
+pheno_file = 'CobaltChloride'
+var_com = np.loadtxt('var.txt')
+ag = np.loadtxt(bed_file + '.agrm0')
+pe = np.eye(ag.shape[0]) 
+gmat_lst = [ag, ag*ag, pe]
+# parallel=[3, 1] means divide total tests into three parts and run part 1
+remma_epiAA_approx_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 1], p_cut=1.0e-5, out_file='epiAA_approx_parallel')
+
+## parallel 2
+import logging
+logging.basicConfig(level=logging.INFO)
+import numpy as np
+from gmat.remma.remma_epiAA import remma_epiAA_approx_parallel
+bed_file = 'CobaltChloride'
+pheno_file = 'CobaltChloride'
+var_com = np.loadtxt('var.txt')
+ag = np.loadtxt(bed_file + '.agrm0')
+pe = np.eye(ag.shape[0]) 
+gmat_lst = [ag, ag*ag, pe]
+# parallel=[3, 2] means divide total tests into three parts and run part 2
+remma_epiAA_approx_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 2], p_cut=1.0e-5, out_file='epiAA_approx_parallel')
+
+## parallel 3
+import logging
+logging.basicConfig(level=logging.INFO)
+import numpy as np
+from gmat.remma.remma_epiAA import remma_epiAA_approx_parallel
+bed_file = 'CobaltChloride'
+pheno_file = 'CobaltChloride'
+var_com = np.loadtxt('var.txt')
+ag = np.loadtxt(bed_file + '.agrm0')
+pe = np.eye(ag.shape[0]) 
+gmat_lst = [ag, ag*ag, pe]
+# parallel=[3, 3] means divide total tests into three parts and run part 3
+remma_epiAA_approx_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel=[3, 3], p_cut=1.0e-5, out_file='epiAA_approx_parallel')
+
+# Step 4: Merge files 'epiAA_approx_parallel.*' 
+# with the following codes.
+import os
+prefix = 'epiAA_approx_parallel'
+parallel_num = 3  # the number of parallels
+with open(prefix + '.merge', 'w') as fout:
+    with open(prefix + '.1') as fin:
+        head_line = fin.readline()
+        fout.write(head_line)
+    for i in range(1, parallel_num+1):
+        with open(prefix + '.' + str(i)) as fin:
+            head_line = fin.readline()
+            for line in fin:
+                fout.write(line)
+        os.remove(prefix + '.' + str(i))
+
+# Step 5: Select top SNPs and add the SNP position
+from gmat.remma import annotation_snp_pos                   
+res_file = 'epiAA_approx_parallel.merge'  # result file
+annotation_snp_pos(res_file, bed_file, p_cut=0.05*2/(28220*28219), dis=0)  # p values < 1.0e-5 and the distance between SNP pairs > 0
+
 ```
 </code></pre>
 </details>
