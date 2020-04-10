@@ -9,9 +9,10 @@ import sys
 from scipy.stats import chi2
 
 from gmat.process_plink.process_plink import read_plink, impute_geno
+from gmat.uvlmm.design_matrix import design_matrix_wemai_multi_gmat
 
 
-def remma_dom(y, xmat, zmat, gmat_lst, var_com, bed_file, out_file='remma_dom'):
+def _remma_dom(y, xmat, zmat, gmat_lst, var_com, bed_file, out_file='remma_dom'):
     """
     Dominance test by random SNP-BLUP model.
     :param y: phenotypic vector
@@ -76,3 +77,20 @@ def remma_dom(y, xmat, zmat, gmat_lst, var_com, bed_file, out_file='remma_dom'):
         logging.error(e)
         sys.exit()
     return res_df
+
+
+def remma_dom(pheno_file, bed_file, gmat_lst, var_com, out_file='remma_dom'):
+    """
+    Dominance test by random SNP-BLUP model.
+    :param pheno_file: phenotypic file. The fist two columns are family id, individual id which are same as plink *.fam
+    file. The third column is always ones for population mean. The last column is phenotypic values. The ohter covariate
+    can be added between columns for population mean and phenotypic values.
+    :param bed_file: the prefix for binary file
+    :param gmat_lst: a list of genomic relationship matrixes.
+    :param var_com: Estimated variances
+    :param out_file: output file. default value is 'remma_dom'.
+    :return: pandas data frame for results.
+    """
+    y, xmat, zmat = design_matrix_wemai_multi_gmat(pheno_file, bed_file)
+    res = _remma_dom(y, xmat, zmat, gmat_lst, var_com, bed_file, out_file=out_file)
+    return res
