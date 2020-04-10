@@ -58,7 +58,8 @@ int read_plink_bed(char *bed_file, long long num_id, long long num_snp, double *
 
 /***********加加互作 ***********/ 
 
-int print_outAA(long long i, long long *snp_lst_0, long long num_snp, long long num_id, double *marker_mat, double *pymat, double eff_cut, FILE *out_res) {
+int print_outAA(long long i, long long *snp_lst_0, long long num_snp, long long num_id, double *marker_mat, double *pymat, 
+        double eff_cut, FILE *out_res, long long len_snp_lst_0, char *bar) {
 	/*输出互作效应，为openmp服务 */
 	long long j=0, k=0;
 	double epi_effect=0.0;
@@ -76,7 +77,11 @@ int print_outAA(long long i, long long *snp_lst_0, long long num_snp, long long 
 	}
 	finish = clock();
 	duration = (double)(finish - start) / CLOCKS_PER_SEC;
-	printf( "Time for the %lld SNP is: %f seconds\n", i, duration);
+	int bar_len = (int) i*100.0/len_snp_lst_0 + 1;
+	char bari[102];
+	strncpy(bari, bar, bar_len);
+	printf("\r[%-101s] [%3d%%] [consuming time: %g seconds]", bari, bar_len, duration);
+	fflush(stdout);
 	return 0;
 }
 
@@ -113,11 +118,17 @@ int remma_epiAA_eff_cpu(char *bed_file, long long num_id, long long num_snp,
 	}
 	fprintf(out_res, "%s %s %s\n", "snp_0", "snp_1", "eff");
 	
+	char bar[102];
+	for(i=0; i<=100; i++){
+		bar[i] = '#';
+	}
 	#pragma omp parallel for schedule(guided, 5)
 	for(i = 0; i < len_snp_lst_0; i++){
 		//printf("%ld %ld ", i, snp_lst_0[i]);
-		print_outAA(i, snp_lst_0, num_snp, num_id, marker_mat, pymat, eff_cut, out_res);
+		print_outAA(i, snp_lst_0, num_snp, num_id, marker_mat, pymat, eff_cut, out_res, len_snp_lst_0, bar);
 	}
+	printf("\r[%-101s] [%3d%%]\n", bar, 100);
+	fflush(stdout);
 	fclose(out_res); 
 	out_res = NULL; 
 	free(marker_mat) ;
@@ -129,7 +140,8 @@ int remma_epiAA_eff_cpu(char *bed_file, long long num_id, long long num_snp,
 /***********加显互作 ***********/ 
 
 
-int print_outAD(long long i, long long *snp_lst_0, long long num_snp, long long num_id, double *marker_matA, double *marker_matD, double *pymat, double eff_cut, FILE *out_res) {
+int print_outAD(long long i, long long *snp_lst_0, long long num_snp, long long num_id, double *marker_matA, double *marker_matD, 
+        double *pymat, double eff_cut, FILE *out_res, long long len_snp_lst_0, char *bar) {
 	long long j=0, k=0;
 	double epi_effect=0.0;
 	clock_t start, finish;
@@ -153,7 +165,11 @@ int print_outAD(long long i, long long *snp_lst_0, long long num_snp, long long 
 	}
 	finish = clock();
 	duration = (double)(finish - start) / CLOCKS_PER_SEC;
-	printf( "Time for the %lld SNP is: %f seconds\n", i, duration);
+	int bar_len = (int) i*100.0/len_snp_lst_0 + 1;
+	char bari[102];
+	strncpy(bari, bar, bar_len);
+	printf("\r[%-101s] [%3d%%] [consuming time: %g seconds]", bari, bar_len, duration);
+	fflush(stdout);
 	return 0;
 }
 
@@ -194,11 +210,17 @@ int remma_epiAD_eff_cpu(char *bed_file, long long num_id, long long num_snp,
 	}
 	fprintf(out_res, "%s %s %s\n", "snp_0", "snp_1", "eff");
 	
+	char bar[102];
+	for(i=0; i<=100; i++){
+		bar[i] = '#';
+	}
 	#pragma omp parallel for schedule(guided, 5)
 	for(i = 0; i < len_snp_lst_0; i++){
 		//printf("%ld %ld ", i, snp_lst_0[i]);
-		print_outAD(i, snp_lst_0, num_snp, num_id, marker_matA, marker_matD, pymat, eff_cut, out_res);
+		print_outAD(i, snp_lst_0, num_snp, num_id, marker_matA, marker_matD, pymat, eff_cut, out_res, len_snp_lst_0, bar);
 	}
+	printf("\r[%-101s] [%3d%%]\n", bar, 100);
+	fflush(stdout);
 	fclose(out_res);  
 	out_res = NULL; 
 	free(marker_matA) ;
@@ -212,7 +234,8 @@ int remma_epiAD_eff_cpu(char *bed_file, long long num_id, long long num_snp,
 /***********显显互作 ***********/ 
 
 
-int print_outDD(long long i, long long *snp_lst_0, long long num_snp, long long num_id, double *marker_mat, double *pymat, double eff_cut, FILE *out_res) {
+int print_outDD(long long i, long long *snp_lst_0, long long num_snp, long long num_id, double *marker_mat, double *pymat, 
+        double eff_cut, FILE *out_res, long long len_snp_lst_0, char *bar) {
 	long long j=0, k=0;
 	double epi_effect=0.0;
 	clock_t start, finish;
@@ -229,7 +252,11 @@ int print_outDD(long long i, long long *snp_lst_0, long long num_snp, long long 
 	}
 	finish = clock();
 	duration = (double)(finish - start) / CLOCKS_PER_SEC;
-	printf( "Time for the %lld SNP is: %f seconds\n", i, duration);
+	int bar_len = (int) i*100.0/len_snp_lst_0 + 1;
+	char bari[102];
+	strncpy(bari, bar, bar_len);
+	printf("\r[%-101s] [%3d%%] [consuming time: %g seconds]", bari, bar_len, duration);
+	fflush(stdout);
 	return 0;
 }
 
@@ -267,11 +294,17 @@ int remma_epiDD_eff_cpu(char *bed_file, long long num_id, long long num_snp,
 	}
 	fprintf(out_res, "%s %s %s\n", "snp_0", "snp_1", "eff");
 	
+	char bar[102];
+	for(i=0; i<=100; i++){
+		bar[i] = '#';
+	}
 	#pragma omp parallel for schedule(guided, 5)
 	for(i = 0; i < len_snp_lst_0; i++){
 		//printf("%ld %ld ", i, snp_lst_0[i]);
-		print_outDD(i, snp_lst_0, num_snp, num_id, marker_mat, pymat, eff_cut, out_res);
+		print_outDD(i, snp_lst_0, num_snp, num_id, marker_mat, pymat, eff_cut, out_res, len_snp_lst_0, bar);
 	}
+	printf("\r[%-101s] [%3d%%]\n", bar, 100);
+	fflush(stdout);
 	fclose(out_res); 
 	out_res = NULL; 
 	free(marker_mat) ;
