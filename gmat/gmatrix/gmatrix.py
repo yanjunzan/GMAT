@@ -8,9 +8,9 @@ from gmat.process_plink.process_plink import read_plink, impute_geno
 
 
 def output_mat(mat, id, out_file, out_fmt):
-    if out_fmt is 'mat':
+    if out_fmt == 'mat':
         np.savetxt(out_file + '0', mat)
-    elif out_fmt is 'row_col_val':
+    elif out_fmt == 'row_col_val':
         ind = np.tril_indices_from(mat)
         df = pd.DataFrame({
             "row": ind[0]+1,
@@ -18,7 +18,7 @@ def output_mat(mat, id, out_file, out_fmt):
             "val": mat[ind]
         })
         df.to_csv(out_file + '1', sep=' ', index=False, header=False, columns=["row", "col", "val"])
-    elif out_fmt is 'id_id_val':
+    elif out_fmt == 'id_id_val':
         ind = np.tril_indices_from(mat)
         df = pd.DataFrame({
             "id0": id[ind[0]],
@@ -74,7 +74,7 @@ def agmat(bed_file, inv=False, small_val=0.001, out_fmt='mat'):
     out_file = bed_file + '.agrm'
     logging.info("The output file is " + out_file)
     res = output_mat(kin, id, out_file, out_fmt)
-    if res is 0:
+    if res == 0:
         logging.error('Not Recognized output format: ' + out_fmt)
         sys.exit()
     kin_inv = None
@@ -139,7 +139,7 @@ def dgmat_as(bed_file, inv=False, small_val=0.001, out_fmt='mat'):
     out_file = bed_file + '.dgrm_as'
     logging.info("The output file is " + out_file)
     res = output_mat(kin, id, out_file, out_fmt)
-    if res is 0:
+    if res == 0:
         logging.error('Not Recognized output format: ' + out_fmt)
         sys.exit()
     kin_inv = None

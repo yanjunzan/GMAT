@@ -4,6 +4,7 @@ from functools import reduce
 import gc
 import time
 from scipy.stats import chi2
+from tqdm import tqdm
 
 from gmat.process_plink.process_plink import read_plink, impute_geno
 
@@ -32,13 +33,15 @@ def uvlmm_gwas_add(y, xmat, gmat_lst, var_com, bed_file):
         print('Missing genotypes are imputed with random genotypes.')
         snp_mat = impute_geno(snp_mat)
     freq = np.sum(snp_mat, axis=0) / (2 * snp_mat.shape[0])
+    scale = np.sum(2*freq*(1-freq))
     freq.shape = (1, snp_mat.shape[1])
     snp_mat = snp_mat - 2 * freq
     # 检验
     eff_vec = []
     chi_vec = []
+    scale_vec = []
     p_vec = []
-    for i in range(snp_mat.shape[1]):
+    for i in tdqm(range(snp_mat.shape[1])):
         xmat_snp = np.concatenate([xmat, snp_mat[:, i:(i+1)]], axis=1)
         vxmat = np.dot(vmat, xmat_snp)
         xvxmat = np.dot(xmat_snp.T, vxmat)
@@ -48,6 +51,7 @@ def uvlmm_gwas_add(y, xmat, gmat_lst, var_com, bed_file):
         snp_chi = snp_eff*snp_eff/snp_var
         p_val = chi2.sf(snp_chi, 1)
         eff_vec.append(snp_eff)
+        scale_vec.append(var_com[0]/(scale*snp_var))
         chi_vec.append(snp_chi)
         p_vec.append(p_val)
     snp_info_file = bed_file + '.bim'
@@ -55,6 +59,7 @@ def uvlmm_gwas_add(y, xmat, gmat_lst, var_com, bed_file):
     res_df = snp_info.iloc[:, [0, 1, 3, 4, 5]]
     res_df.columns = ['chro', 'snp_ID', 'pos', 'allele1', 'allele2']
     res_df.loc[:, 'eff_val'] = eff_vec
+    res_df.loc[:, 'scale_val'] = scale_vec
     res_df.loc[:, 'chi_val'] = chi_vec
     res_df.loc[:, 'p_val'] = p_vec
     return res_df

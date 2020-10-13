@@ -17,7 +17,8 @@ from gmat.uvlmm.design_matrix import design_matrix_wemai_multi_gmat
 from _cremma_epi_eff_cpu import ffi, lib
 
 
-def _remma_epiAA_eff(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None, var_app=1.0, p_cut=1.0e-5, out_file='epiAA_eff'):
+def _remma_epiAD_maf_eff(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None, freqA=None, freqD=None,
+                         freq_deno=None, p_cut=1.0e-5, out_file='epiAD_maf_eff'):
     """
     Estimate additive by additive epistasis effects by random SNP-BLUP model.
     :param y: phenotypic vector
@@ -60,6 +61,12 @@ def _remma_epiAA_eff(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None,
         if max(snp_lst_0) >= num_snp - 1 or min(snp_lst_0) < 0:
             logging.error('snp_lst_0 is out of range!')
             sys.exit()
+    if freqA is None:
+        freqA = np.zeros((num_snp,), dtype=np.longlong)
+    if freqD is None:
+        freqD = np.zeros((num_snp,), dtype=np.longlong)
+    if freq_deno is None:
+        freq_deno = np.ones(111)
     logging.info("Convert python variates to C type")
     pbed_file = ffi.new("char[]", bed_file.encode('ascii'))
     pnum_id = ffi.cast("long long", num_id)
@@ -68,16 +75,19 @@ def _remma_epiAA_eff(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None,
     psnp_lst_0 = ffi.cast("long long *", snp_lst_0.ctypes.data)
     # psnp_lst_0 = ffi.cast("long long *", ffi.from_buffer(snp_lst_0))
     plen_snp_lst_0 = ffi.cast("long long", len(snp_lst_0))
+    pfreqA = ffi.cast("long long *", freqA.ctypes.data)
+    pfreqD = ffi.cast("long long *", freqD.ctypes.data)
     ppymat = ffi.cast("double *", pymat.ctypes.data)
     chi_cut = chi2.isf(p_cut, 1)
-    eff_cut = np.sqrt(chi_cut * var_app)
-    peff_cut = ffi.cast("double", eff_cut)
+    eff_cut = np.array(np.sqrt(chi_cut * freq_deno))
+    peff_cut = ffi.cast("double *", eff_cut.ctypes.data)
+    # peff_cut = ffi.cast("double", 1.0)
     temp_file = out_file + '.temp'
     pout_file = ffi.new("char[]", temp_file.encode('ascii'))
     logging.info('Test')
     clock_t0 = time.perf_counter()
     cpu_t0 = time.process_time()
-    lib.remma_epiAA_eff_cpu(pbed_file, pnum_id, pnum_snp, psnp_lst_0, plen_snp_lst_0, ppymat, peff_cut, pout_file)
+    lib.remma_epiAD_maf_eff_cpu(pbed_file, pnum_id, pnum_snp, psnp_lst_0, plen_snp_lst_0, ppymat, pfreqA, pfreqD, peff_cut, pout_file)
     clock_t1 = time.perf_counter()
     cpu_t1 = time.process_time()
     logging.info("Running time: Clock time, {:.5f} sec; CPU time, {:.5f} sec.".format(clock_t1 - clock_t0, cpu_t1 - cpu_t0))
@@ -89,14 +99,14 @@ def _remma_epiAA_eff(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=None,
         fout.write(head_line)
         for line in fin:
             arr = line.split()
-            chi_app = float(arr[-1]) * float(arr[-1]) / var_app
+            chi_app = float(arr[-1]) * float(arr[-1]) / freq_deno[freqA[int(arr[0])] * 10 + freqD[int(arr[1])]]
             p_app = chi2.sf(chi_app, 1)
             fout.write(' '.join(arr + [str(chi_app), str(p_app)]) + '\n')
     os.remove(temp_file)
     return 0
 
 
-def remma_epiAA_eff(pheno_file, bed_file, gmat_lst, var_com, snp_lst_0=None, var_app=1.0, p_cut=1.0e-5, out_file='epiAA_eff'):
+def remma_epiAD_maf_eff(pheno_file, bed_file, gmat_lst, var_com, snp_lst_0=None, freqA=None, freqD=None, freq_deno=None, p_cut=1.0e-5, out_file='epiAA_maf_eff'):
     """
     Estimate additive by additive epistasis effects by random SNP-BLUP model.
     :param pheno_file: phenotypic file. The fist two columns are family id, individual id which are same as plink *.fam
@@ -113,13 +123,13 @@ def remma_epiAA_eff(pheno_file, bed_file, gmat_lst, var_com, snp_lst_0=None, var
     :return: 0
     """
     y, xmat, zmat = design_matrix_wemai_multi_gmat(pheno_file, bed_file)
-    res = _remma_epiAA_eff(y, xmat, zmat, gmat_lst, var_com, bed_file,
-                           snp_lst_0=snp_lst_0, var_app=var_app, p_cut=p_cut, out_file=out_file)
+    res = _remma_epiAD_maf_eff(y, xmat, zmat, gmat_lst, var_com, bed_file,
+                           snp_lst_0=snp_lst_0, freqA=freqA, freqD=freqD, freq_deno=freq_deno, p_cut=p_cut, out_file=out_file)
     return res
 
 
-def _remma_epiAA_eff_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel,
-                                   var_app=1.0, p_cut=1.0e-5, out_file='epiAA_eff_parallel'):
+def _remma_epiAD_maf_eff_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel,
+                                freqA=None, freqD=None, freq_deno=None, p_cut=1.0e-5, out_file='epiAA_maf_eff_parallel'):
     """
     Parallel version. Additive by additive epistasis test by random SNP-BLUP model.
     :param y: phenotypic vector
@@ -149,13 +159,13 @@ def _remma_epiAA_eff_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parall
     logging.info('SNP position point: ' +
                  ','.join(list(np.array([snp_pos_0, snp_pos_1, snp_pos_2, snp_pos_3], dtype=str))))
     snp_list_0 = list(range(snp_pos_0, snp_pos_1)) + list(range(snp_pos_2, snp_pos_3))
-    res = _remma_epiAA_eff(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=snp_list_0, var_app=var_app,
-                                p_cut=p_cut, out_file=out_file + '.' + str(parallel[1]))
+    res = _remma_epiAD_maf_eff(y, xmat, zmat, gmat_lst, var_com, bed_file, snp_lst_0=snp_list_0, freqA=freqA, freqD=freqD,
+                               freq_deno=freq_deno, p_cut=p_cut, out_file=out_file + '.' + str(parallel[1]))
     return res
 
 
-def remma_epiAA_eff_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel,
-                                   var_app=1.0, p_cut=1.0e-5, out_file='epiAA_eff_parallel'):
+def remma_epiAD_maf_eff_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel,
+                                   freqA=None, freqD=None, freq_deno=None,  p_cut=1.0e-5, out_file='epiAA_maf_eff_parallel'):
     """
     Parallel version. Additive by additive epistasis test by random SNP-BLUP model.
     :param pheno_file: phenotypic file. The fist two columns are family id, individual id which are same as plink *.fam
@@ -168,11 +178,11 @@ def remma_epiAA_eff_parallel(pheno_file, bed_file, gmat_lst, var_com, parallel,
     integer is the part to run. For example, parallel = [3, 1], parallel = [3, 2] and parallel = [3, 3] mean to divide
     :param var_app: the approximate variances for estimated SNP effects.
     :param p_cut: put cut value. default value is 1.0e-5.
-    :param out_file: output file. default value is 'epiAA_eff_parallel'.
+    :param out_file: output file. default value is 'epiAA_maf_eff_parallel'.
     :return: 0
     """
     y, xmat, zmat = design_matrix_wemai_multi_gmat(pheno_file, bed_file)
-    res = _remma_epiAA_eff_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel,
-                                   var_app=var_app, p_cut=p_cut, out_file=out_file)
+    res = _remma_epiAD_maf_eff_parallel(y, xmat, zmat, gmat_lst, var_com, bed_file, parallel,
+                                   freqA=freqA, freqD=freqD, freq_deno=freq_deno,  p_cut=p_cut, out_file=out_file)
     return res
 

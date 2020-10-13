@@ -2,7 +2,7 @@ import numpy as np
 from functools import reduce
 import gc
 import logging
-from gmat.uvlmm.design_matrix import design_matrix_wemai_multi_gmat
+from gmat.uvlmm.design_matrix import design_matrix_wemai_multi_gmat, design_matrix_wemai_multi_gmat_pred
 
 
 def _wemai_multi_gmat(y, xmat, zmat, gmat_lst, init=None, maxiter=200, cc_par=1.0e-8, cc_gra=1.0e-6):
@@ -123,6 +123,47 @@ def wemai_multi_gmat(pheno_file, bed_file, gmat_lst, init=None, maxiter=200, cc_
     y, xmat, zmat = design_matrix_wemai_multi_gmat(pheno_file, bed_file)
     var_com = _wemai_multi_gmat(y, xmat, zmat, gmat_lst, init=init, maxiter=maxiter, cc_par=cc_par, cc_gra=cc_gra)
     np.savetxt(out_file, var_com)
+    return var_com
+
+
+def wemai_multi_gmat_pred(pheno_file, bed_file, gmat_lst, init=None, maxiter=200, cc_par=1.0e-8, cc_gra=1.0e-6, out_file='wemai_multi_gmat_pred'):
+    """
+    Estimate variances for univariate linear mixed model. Multiple genomic relationship matrixes can be included.
+    Weighted EM an AI algorithm are used.
+    :param pheno_file: phenotypic file. The fist two columns are family id, individual id which are same as plink *.fam
+    file. The third column is always ones for population mean. The last column is phenotypic values. The ohter covariate
+    can be added between columns for population mean and phenotypic values.
+    :param bed_file: the prefix for binary file
+    :param gmat_lst: a list of genomic relationship matrixes.
+    :param init: initial values for variances. default value is None.
+    :param maxiter: the maximal number of interactions. default value is 200.
+    :param cc_par: The convergence criteria for update vector.
+    :param cc_gra: The convergence criteria for gradient vector
+    :param out_file: output file to save the estimated variances
+    :return: the estimated variances
+    """
+    y, xmat, zmat = design_matrix_wemai_multi_gmat_pred(pheno_file, bed_file)
+    var_com = _wemai_multi_gmat(y, xmat, zmat, gmat_lst, init=init, maxiter=maxiter, cc_par=cc_par, cc_gra=cc_gra)
+    np.savetxt(out_file + '.var', var_com)
+    logging.info('Predict the random effects')
+    zgmat_lst = []
+    for val in range(len(gmat_lst)):
+        zgmat_lst.append(zmat.dot((zmat.dot(gmat_lst[val])).T))
+    vmat = np.diag([var_com[-1]] * y.shape[0])
+    for val in range(len(zgmat_lst)):
+        vmat += zgmat_lst[val] * var_com[val]
+    vxmat = np.dot(vmat, xmat)
+    xvxmat = np.dot(xmat.T, vxmat)
+    xvxmat = np.linalg.inv(xvxmat)
+    pmat = reduce(np.dot, [vxmat, xvxmat, vxmat.T])
+    pmat = vmat - pmat
+    zpymat = zmat.T.dot(np.dot(pmat, y))
+    rand_eff = []
+    for val in range(len(gmat_lst)):
+        eff = np.dot(gmat_lst[val], zpymat) * var_com[val]
+        rand_eff.append(eff)
+    rand_eff = np.concatenate(rand_eff, axis=1)
+    np.savetxt(out_file + '.rand_eff', rand_eff)
     return var_com
 
 
@@ -421,4 +462,5 @@ def pxemai_mme(y, xmat, gmat_inv, init=None, maxiter=100, cc=1.0e-8):
     else:
         print('Variances not converged.')
     return var_com
+
 

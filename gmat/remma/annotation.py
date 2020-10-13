@@ -19,7 +19,7 @@ def gtf_to_gene_info(gtf_file):
     fout.close()
 
 
-def annotation_snp_pos(res_file, bed_file, p_cut=1, dis=0):
+def annotation_snp_pos(res_file, bed_file, p_cut=1, dis=0, ld_file=None, r2=0.2):
     """
     add the snp information for the epistasis result file; select top significant SNP pairs based on p cut value;
     select SNP pairs bases on their distance.
@@ -54,6 +54,23 @@ def annotation_snp_pos(res_file, bed_file, p_cut=1, dis=0):
                 fout.write(' ')
                 fout.write(' '.join(arr[2:]))
                 fout.write('\n')
+    if ld_file is not None:
+        ld_id= {}
+        with open(ld_file, 'r') as fin:
+            fin.readline()
+            for line in fin:
+                arr = line.split()
+                if float(arr[-1]) > r2:
+                    ld_id[' '.join([arr[2], arr[5]])] = 1
+                    ld_id[' '.join([arr[5], arr[2]])] = 1
+        with open(res_file + '.anno', 'r') as fin, open(res_file + '.anno.ld', 'w') as fout:
+            line = fin.readline()
+            fout.write(line)
+            for line in fin:
+                arr = line.split()
+                snp = ' '.join([arr[2], arr[9]])
+                if snp not in ld_id:
+                    fout.write(line)
     return 0
 
 
